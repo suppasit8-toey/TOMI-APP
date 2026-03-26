@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Funnel, Wallet, Image as ImageIcon, PencilSimple, Receipt, Printer } from '@phosphor-icons/react';
+import { Plus, Funnel, Wallet, Image as ImageIcon, PencilSimple, Receipt, Printer, Trash } from '@phosphor-icons/react';
 import { supabase } from '@/lib/supabase';
 import Swal from 'sweetalert2';
 import Link from 'next/link';
@@ -10,8 +10,8 @@ import { useAuth } from '@/components/AuthProvider';
 export default function AccountsPage() {
   const { user } = useAuth();
   const [accounts, setAccounts] = useState<any[]>([]);
-  const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString());
-  const [filterMonth, setFilterMonth] = useState((new Date().getMonth() + 1).toString());
+  const [filterYear, setFilterYear] = useState('');
+  const [filterMonth, setFilterMonth] = useState('');
   const [loading, setLoading] = useState(true);
 
   // Modal
@@ -82,6 +82,31 @@ export default function AccountsPage() {
     Swal.fire('สำเร็จ', 'อัปเดตรูปภาพแล้ว', 'success');
     setUploadModal({ open: false, id: null });
     setFileRaw(null);
+    loadData();
+  };
+
+  const deleteAccount = async (id: string, detail: string) => {
+    const result = await Swal.fire({
+      title: 'ลบรายการนี้?',
+      text: `คุณต้องการลบรายการ "${detail || 'รายการนี้'}" ใช่หรือไม่?\nข้อมูลการเงินจะลดลงตามรายการที่ลบ`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ลบรายการ',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#ef4444'
+    });
+    
+    if (!result.isConfirmed) return;
+
+    setLoading(true);
+    const { error } = await supabase.from('accounts').delete().eq('id', id);
+    if (error) {
+      setLoading(false);
+      return Swal.fire('ผิดพลาด', error.message, 'error');
+    }
+
+    await supabase.from('app_logs').insert({ action_by: user?.name, action_type: 'DELETE', description: `ลบรายการบัญชี ${detail}`, ref_id: id });
+    Swal.fire('สำเร็จ', 'ลบรายการแล้ว', 'success');
     loadData();
   };
 
@@ -184,7 +209,7 @@ export default function AccountsPage() {
                       <PencilSimple weight="fill" className="mr-0.5" /> {acc.created_by}
                     </span>
                   </div>
-                  <div className="mt-2">
+                  <div className="mt-2 flex gap-2">
                     {acc.evidence_url ? (
                       <a href={acc.evidence_url} target="_blank" className="inline-flex gap-1.5 items-center text-[11px] text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-md transition font-medium border border-blue-100">
                         <ImageIcon weight="fill" /> ดูใบเสร็จ/หลักฐาน
@@ -194,6 +219,9 @@ export default function AccountsPage() {
                         + เพิ่มรูป/สลิป
                       </button>
                     )}
+                    <button onClick={() => deleteAccount(acc.id, acc.detail)} className="inline-flex gap-1.5 items-center text-[11px] text-red-500 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition font-medium opacity-0 group-hover:opacity-100 focus:opacity-100">
+                      <Trash weight="fill" /> ลบ
+                    </button>
                   </div>
                 </td>
                 <td className="py-4 px-4 align-top text-right">

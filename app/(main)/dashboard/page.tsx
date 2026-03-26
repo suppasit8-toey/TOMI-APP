@@ -9,8 +9,8 @@ export default function DashboardPage() {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [totalStockValue, setTotalStockValue] = useState(0);
   
-  const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString());
-  const [filterMonth, setFilterMonth] = useState((new Date().getMonth() + 1).toString());
+  const [filterYear, setFilterYear] = useState('');
+  const [filterMonth, setFilterMonth] = useState('');
 
   const loadData = async () => {
     setLoading(true);

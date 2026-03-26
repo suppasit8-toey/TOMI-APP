@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/components/AuthProvider';
 import Swal from 'sweetalert2';
-import { ArrowLeft, PencilSimple, User, Phone, MapPin, Image as ImageIcon, Coins, CheckCircle, Plus, FilePdf, ArrowSquareOut, Warning } from '@phosphor-icons/react';
+import { ArrowLeft, PencilSimple, User, Phone, MapPin, Image as ImageIcon, Coins, CheckCircle, Plus, FilePdf, ArrowSquareOut, Warning, Trash } from '@phosphor-icons/react';
 
 const filterOptions = ['ทั้งหมด', 'ใหม่', 'นัดวัด', 'เสนอราคา', 'รอติดตั้ง', 'รอรับเงิน', 'รอปิดงาน', 'เสร็จสิ้น', 'ยกเลิก'];
 
@@ -234,6 +234,81 @@ export default function ProjectDetailPage() {
     setLoading(false);
   };
 
+  const deleteTransaction = async (t: any) => {
+    const result = await Swal.fire({
+      title: 'ลบรายการนี้?',
+      text: `คุณต้องการลบรายการ "${t.detail || t.stage_name}" ใช่หรือไม่?\nระบบจะหักยอดเงินและปรับสถานะให้ใหม่ (ถ้าเป็นการตัดสต็อก จะคืนยอดฟิล์มกลับเข้าระบบ)`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ลบรายการ',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#ef4444'
+    });
+    if (!result.isConfirmed) return;
+
+    setLoading(true);
+    try {
+      // 1. Delete from project_transactions
+      await supabase.from('project_transactions').delete().eq('id', t.id);
+
+      // 2. If it was stock cut, return stock
+      if (t.stage_name === 'ใช้ฟิล์ม (ตัดสต็อก)' && t.stock_id && t.amount_used) {
+        const { data: stock } = await supabase.from('stocks').select('remaining_length').eq('id', t.stock_id).single();
+        if (stock) {
+          const newRemain = Number(stock.remaining_length) + Number(t.amount_used);
+          await supabase.from('stocks').update({ remaining_length: newRemain, status: newRemain > 0 ? 'มีของ' : 'หมด' }).eq('id', t.stock_id);
+        }
+      }
+
+      // 3. Delete from accounts if exists
+      if (t.type && t.amount > 0) {
+        // Find matching account record by approximate detail and amount
+        await supabase.from('accounts').delete().eq('project_id', projectId).eq('detail', t.detail).eq('amount', t.amount).eq('type', t.type);
+      }
+
+      // 4. Recalculate Project Totals and Status
+      const { data: allTr } = await supabase.from('project_transactions').select('*').eq('project_id', projectId);
+      let inc = 0, cost = 0;
+      allTr?.forEach(r => {
+        if (r.type === 'Income') inc += Number(r.amount);
+        if (r.is_cost) cost += Number(r.amount);
+      });
+
+      // Auto-Status Logic
+      let nextStatus = project.status;
+      if (project.status !== 'ยกเลิก') {
+        // Start from beginning and find the furthest step completed
+        const completedSteps = allTr?.map(t => t.stage_name) || [];
+        if (completedSteps.some(cs => cs.includes('งวดสุดท้าย'))) nextStatus = 'รอปิดงาน';
+        else if (completedSteps.some(cs => cs.includes('ค่าติดตั้ง'))) nextStatus = 'รอรับเงิน';
+        else if (completedSteps.some(cs => cs.includes('รับมัดจำ'))) nextStatus = 'รอติดตั้ง';
+        else if (completedSteps.some(cs => cs.includes('ใบเสนอราคา'))) nextStatus = 'เสนอราคา';
+        else if (completedSteps.some(cs => cs.includes('วัดหน้างาน'))) nextStatus = 'นัดวัด';
+        else nextStatus = 'ใหม่';
+
+        const requiredSteps = ['วัดหน้างาน', 'ใบตัดฟิล์ม', 'ใบเสนอราคา', 'รับมัดจำ', 'ใช้ฟิล์ม', 'คุมงานติดตั้ง', 'ค่าติดตั้ง', 'งวดสุดท้าย', 'ค่าใช้จ่ายอื่น'];
+        if (allTr && allTr.length > 0 && requiredSteps.every(s => completedSteps.some(cs => cs.includes(s)))) {
+          nextStatus = 'เสร็จสิ้น';
+        }
+      }
+
+      await supabase.from('projects').update({
+        total_income: inc,
+        total_expense: cost,
+        net_profit: inc - cost,
+        status: nextStatus,
+        updated_at: new Date().toISOString()
+      }).eq('id', projectId);
+
+      await supabase.from('app_logs').insert({ action_by: user?.name, action_type: 'DELETE', description: `ลบรายการ ${t.stage_name} ในโปรเจกต์ ${project.name}`, ref_id: projectId });
+      Swal.fire('สำเร็จ', 'ลบรายการแล้ว', 'success');
+      loadData();
+    } catch (err: any) {
+      Swal.fire('ผิดพลาด', err.message, 'error');
+    }
+    setLoading(false);
+  };
+
   const fmt = (num: number) => new Intl.NumberFormat('th-TH').format(num || 0);
 
   if (loading && !project) return <div className="p-8 text-center text-slate-500 animate-pulse">กำลังโหลด...</div>;
@@ -343,6 +418,9 @@ export default function ProjectDetailPage() {
                               {t.ref_user_id && <span className="flex items-center gap-1 bg-white border px-1.5 py-0.5 rounded text-slate-500"><User weight="fill" className="text-blue-400" /> {t.ref_user_id}</span>}
                               <span>{t.action_date}</span>
                             </div>
+                            <button onClick={() => deleteTransaction(t)} className="text-red-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-md transition flex items-center gap-1 font-bold">
+                               <Trash weight="bold" /> ลบ
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -363,13 +441,13 @@ export default function ProjectDetailPage() {
           <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <h3 className="font-bold text-xl mb-4 text-slate-800">แก้ไขข้อมูล</h3>
             <label className="block text-sm font-semibold text-slate-700 mb-1">ชื่อโปรเจกต์</label>
-            <input value={formEdit.name} onChange={e=>setFormEdit({...formEdit, name:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-sm mb-3 outline-none focus:border-blue-500" />
+            <input value={formEdit.name || ''} onChange={e=>setFormEdit({...formEdit, name:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-sm mb-3 outline-none focus:border-blue-500" />
             <label className="block text-sm font-semibold text-slate-700 mb-1">ลูกค้า</label>
-            <input value={formEdit.customer_name} onChange={e=>setFormEdit({...formEdit, customer_name:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-sm mb-3 outline-none focus:border-blue-500" />
+            <input value={formEdit.customer_name || ''} onChange={e=>setFormEdit({...formEdit, customer_name:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-sm mb-3 outline-none focus:border-blue-500" />
             <label className="block text-sm font-semibold text-slate-700 mb-1">ลิงก์รูปก่อนติดตั้ง</label>
-            <input value={formEdit.folder_before_url} onChange={e=>setFormEdit({...formEdit, folder_before_url:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-sm mb-3 outline-none focus:border-blue-500" />
+            <input value={formEdit.folder_before_url || ''} onChange={e=>setFormEdit({...formEdit, folder_before_url:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-sm mb-3 outline-none focus:border-blue-500" />
             <label className="block text-sm font-semibold text-slate-700 mb-1">ลิงก์รูปหลังติดตั้ง</label>
-            <input value={formEdit.folder_after_url} onChange={e=>setFormEdit({...formEdit, folder_after_url:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-sm mb-3 outline-none focus:border-blue-500" />
+            <input value={formEdit.folder_after_url || ''} onChange={e=>setFormEdit({...formEdit, folder_after_url:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-sm mb-3 outline-none focus:border-blue-500" />
             <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
               <button onClick={() => setShowEdit(false)} className="flex-1 font-semibold py-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition">ยกเลิก</button>
               <button onClick={submitEditPrj} className="flex-1 font-semibold py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition">อัปเดต</button>
@@ -408,13 +486,13 @@ export default function ProjectDetailPage() {
 
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-1">วันที่</label>
-              <input type="date" value={formAct.date} onChange={e=>setFormAct({...formAct, date:e.target.value})} className="w-full border rounded-xl px-3 py-2 outline-none" />
+              <input type="date" value={formAct.date || ''} onChange={e=>setFormAct({...formAct, date:e.target.value})} className="w-full border rounded-xl px-3 py-2 outline-none" />
             </div>
 
             {modalAct.hasUser && (
               <div className="mb-4">
                 <label className="block text-sm font-semibold mb-1">ผู้รับผิดชอบ/คุมงาน</label>
-                <select value={formAct.refUserId} onChange={e=>setFormAct({...formAct, refUserId:e.target.value})} className="w-full border rounded-xl px-3 py-2 outline-none">
+                <select value={formAct.refUserId || ''} onChange={e=>setFormAct({...formAct, refUserId:e.target.value})} className="w-full border rounded-xl px-3 py-2 outline-none">
                   <option value="">- เลือก -</option>
                   {userList.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
                 </select>
@@ -461,13 +539,13 @@ export default function ProjectDetailPage() {
                      {modalAct.hasDetail && (
                        <div className="mb-4">
                          <label className="block text-sm font-semibold mb-1">รายละเอียด</label>
-                         <input value={formAct.detail} onChange={e=>setFormAct({...formAct, detail:e.target.value})} className="w-full border rounded-xl px-3 py-2 outline-none" />
+                         <input value={formAct.detail || ''} onChange={e=>setFormAct({...formAct, detail:e.target.value})} className="w-full border rounded-xl px-3 py-2 outline-none" />
                        </div>
                      )}
                      {modalAct.hasAmt && (
                        <div className="mb-4">
                          <label className="block text-sm font-semibold mb-1">จำนวนเงิน</label>
-                         <input type="number" value={formAct.amount} onChange={e=>setFormAct({...formAct, amount:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-xl font-bold outline-none" />
+                         <input type="number" value={formAct.amount ?? ''} onChange={e=>setFormAct({...formAct, amount:e.target.value})} className="w-full border rounded-xl px-3 py-2 text-xl font-bold outline-none" />
                          {modalAct.stg === 3 && (
                            <label className="flex items-center mt-2 p-2 bg-gray-50 rounded border border-dashed cursor-pointer">
                              <input type="checkbox" checked={formAct.vat} onChange={e=>setFormAct({...formAct, vat:e.target.checked})} className="mr-2" /> <span className="text-sm">บวก VAT 7%</span>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, ClockCounterClockwise, PencilSimple, CalendarBlank } from '@phosphor-icons/react';
+import { Plus, ClockCounterClockwise, PencilSimple, CalendarBlank, Printer } from '@phosphor-icons/react';
 import { supabase } from '@/lib/supabase';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/components/AuthProvider';
@@ -22,6 +22,7 @@ export default function StockPage() {
   const [history, setHistory] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editQty, setEditQty] = useState('');
+  const [printItem, setPrintItem] = useState<any>(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -120,6 +121,13 @@ export default function StockPage() {
     loadData();
   };
 
+  const handlePrint = (s: any) => {
+    setPrintItem(s);
+    setTimeout(() => {
+      window.print();
+    }, 300);
+  };
+
   const fmt = (num: number) => new Intl.NumberFormat('th-TH').format(num || 0);
 
   return (
@@ -145,12 +153,23 @@ export default function StockPage() {
             <div className={`absolute top-0 right-0 px-3 py-1.5 text-[10px] font-bold rounded-bl-2xl shadow-sm tracking-wider ${s.status === 'หมด' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
               {s.status}
             </div>
+            
             <div className="flex flex-col mb-3">
               <div className="font-bold text-lg text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition">{s.brand} {s.film_code}</div>
               <div className="text-[11px] text-blue-600 font-bold bg-blue-50 inline-block px-2 py-0.5 rounded-full mb-1 w-fit border border-blue-100">{s.film_type}</div>
               <div className="mt-1 flex flex-col pt-1">
                 <span className="font-barcode text-slate-400 tracking-[0.2em] text-4xl opacity-50 leading-none">{s.id}</span>
               </div>
+            </div>
+
+            <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition">
+               <button 
+                 onClick={(e) => { e.stopPropagation(); handlePrint(s); }}
+                 className="bg-white border border-slate-200 p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:border-blue-400 shadow-sm transition"
+                 title="พิมพ์ฉลาก"
+               >
+                 <Printer weight="bold" />
+               </button>
             </div>
             
             <div className="flex justify-between items-end border-t border-slate-100 pt-3 mt-1">
@@ -222,7 +241,12 @@ export default function StockPage() {
             <div className="flex justify-between items-start mb-4 border-b pb-4">
               <div>
                 <h3 className="font-bold text-xl text-slate-800">{detailModal.info.brand} {detailModal.info.film_code}</h3>
-                <p className="text-xs text-gray-500 font-mono mt-1 bg-gray-100 inline-block px-2 py-0.5 rounded-full font-bold">ID: {detailModal.info.id}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-xs text-gray-500 font-mono bg-gray-100 inline-block px-2 py-0.5 rounded-full font-bold">ID: {detailModal.info.id}</p>
+                  <button onClick={() => handlePrint(detailModal.info)} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 transition">
+                    <Printer weight="fill" /> พิมพ์ฉลาก
+                  </button>
+                </div>
               </div>
               <div className="text-right">
                 {!isEditing ? (
@@ -278,6 +302,73 @@ export default function StockPage() {
           </div>
         </div>
       )}
+
+      {/* PRINTABLE LABEL TEMPLATE */}
+      <div id="print-label" className="stock-label-area" style={{ display: 'none' }}>
+         <style>{`
+           @media print {
+             @page { size: 150mm 100mm; margin: 0; }
+             * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+             body, html { margin: 0; padding: 0; background: white; width: 150mm; height: 100mm; overflow: hidden; }
+             body * { visibility: hidden; }
+             .stock-label-area, .stock-label-area * { visibility: visible; }
+             .stock-label-area { 
+               display: block !important;
+               position: absolute; 
+               left: 0; 
+               top: 0; 
+               width: 150mm; 
+               height: 100mm; 
+               margin: 0;
+               padding: 0;
+               background: white;
+               z-index: 99999;
+             }
+             .no-print { display: none !important; }
+           }
+         `}</style>
+         {printItem && (
+           <div className="w-[150mm] h-[100mm] p-[4mm] flex flex-col bg-white text-black font-sans" style={{ color: '#000' }}>
+             {/* TOP BRAND BAR - PREMIUM INVERTED */}
+             <div className="flex bg-black text-white p-4 h-[30mm] items-center justify-between shrink-0 mb-3">
+               <div className="flex flex-col flex-1 overflow-visible">
+                 <div className="text-[60px] font-black leading-none uppercase tracking-tighter whitespace-nowrap" style={{ color: '#fff' }}>{printItem.brand}</div>
+                 <div className="text-[22px] font-black mt-2 opacity-90 uppercase whitespace-nowrap" style={{ color: '#fff' }}>{printItem.film_code}</div>
+               </div>
+               <div className="w-[45mm] text-right border-l border-white/30 pl-4 h-full flex flex-col justify-center shrink-0">
+                 <div className="text-[16px] font-black uppercase tracking-widest leading-tight mb-1" style={{ color: '#fff' }}>{printItem.film_type}</div>
+                 <div className="text-[16px] font-bold" style={{ color: '#fff' }}>{printItem.width}cm x {printItem.initial_length}m</div>
+               </div>
+             </div>
+
+             {/* MIDDLE SECTION - CLEAN USAGE TRACKING */}
+             <div className="flex-grow flex flex-col mb-3">
+               <div className="flex justify-between items-end mb-1 border-b-2 border-black pb-1">
+                 <div className="text-[12px] font-black uppercase tracking-widest text-black">Manual Usage Recording</div>
+                 <div className="text-[11px] font-bold text-black opacity-60 italic">Purchased: {new Date(printItem.created_at).toLocaleDateString('th-TH')}</div>
+               </div>
+               
+               <div className="flex flex-col gap-0 border-x-2 border-black">
+                 {[1,2,3].map(i => (
+                   <div key={i} className="flex items-center border-b-2 border-black h-[9mm] relative">
+                     <div className="absolute left-1 bottom-0.5 text-[7px] font-black text-black opacity-20 tracking-[0.2em]">ROW {i}</div>
+                     <div className="w-1/3 border-r-2 border-black h-full flex items-center px-4 italic text-[10px] opacity-60">Date:</div>
+                     <div className="w-1/3 border-r-2 border-black h-full flex items-center px-4 italic text-[10px] opacity-60">Used:</div>
+                     <div className="w-1/3 h-full flex items-center px-4 italic text-[10px] opacity-60">Balance:</div>
+                   </div>
+                 ))}
+               </div>
+             </div>
+
+             {/* FOOTER - CLEAR ID ONLY */}
+             <div className="flex flex-col items-center justify-center shrink-0 border-t-2 border-black pt-2 pb-1">
+                <div className="text-[9px] font-black tracking-[0.4em] uppercase opacity-40 mb-1">TOMI FILM MANAGEMENT SYSTEM</div>
+                <div className="text-[36px] font-mono font-black tracking-[0.3em] leading-none text-center" style={{ color: '#000' }}>{printItem.id}</div>
+                <div className="mt-1 text-[8px] font-bold opacity-30 tracking-widest uppercase">Premium Quality Stock Label v2.5</div>
+             </div>
+           </div>
+         )}
+      </div>
 
     </div>
   );
