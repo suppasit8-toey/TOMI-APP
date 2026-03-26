@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Prompt, Libre_Barcode_39_Text } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/components/AuthProvider';
@@ -18,6 +18,13 @@ const barcode = Libre_Barcode_39_Text({
 export const metadata: Metadata = {
   title: 'TOMI FILM MANAGEMENT SYSTEM',
   description: 'ระบบจัดการงานติดตั้งฟิล์ม TOMI FILM',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
