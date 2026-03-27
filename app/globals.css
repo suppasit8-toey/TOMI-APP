@@ -46,7 +46,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    @apply font-sans antialiased min-h-screen overscroll-behavior-y-none;
+    @apply font-sans antialiased min-h-screen overscroll-y-none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
