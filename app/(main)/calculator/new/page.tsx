@@ -323,12 +323,12 @@ export default function CalculatorNewPage() {
                         </div>
                         <div className="space-y-3">
                             {loc.items.map((item: any) => (
-                                <div key={item.id} className="bg-slate-50 border border-slate-100 p-3 rounded-2xl flex flex-wrap sm:flex-nowrap gap-3 items-end">
-                                    <div className="w-full sm:flex-1 min-w-[120px]"><label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">รายการ</label><input type="text" value={item.name} onChange={e=>updateItemParams(loc.id, item.id, 'name', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-semibold text-sm" /></div>
-                                    <div className="flex-1 sm:w-24"><label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">กว้าง ({unit === 'cm' ? 'ซม.' : 'นิ้ว'})</label><input type="number" value={item.w} onChange={e=>updateItemParams(loc.id, item.id, 'w', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-bold text-center text-sm" placeholder="0.0" /></div>
-                                    <div className="flex-1 sm:w-24"><label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">สูง ({unit === 'cm' ? 'ซม.' : 'นิ้ว'})</label><input type="number" value={item.h} onChange={e=>updateItemParams(loc.id, item.id, 'h', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-bold text-center text-sm" placeholder="0.0" /></div>
-                                    <div className="w-16"><label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">จำนวน</label><input type="number" value={item.qty} onChange={e=>updateItemParams(loc.id, item.id, 'qty', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-bold text-center text-sm" /></div>
-                                    <button onClick={()=>removeItem(loc.id, item.id)} className="w-10 h-[38px] flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition shrink-0"><Trash weight="fill" /></button>
+                                <div key={item.id} className="bg-slate-50 border border-slate-100 p-3 rounded-2xl flex flex-wrap gap-2 sm:gap-3 items-end">
+                                    <div className="w-full sm:flex-1 min-w-[120px] order-1"><label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">รายการ</label><input type="text" value={item.name} onChange={e=>updateItemParams(loc.id, item.id, 'name', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-semibold text-sm" /></div>
+                                    <div className="flex-1 sm:w-24 order-2"><label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">กว้าง ({unit === 'cm' ? 'ซม.' : 'นิ้ว'})</label><input type="number" value={item.w} onChange={e=>updateItemParams(loc.id, item.id, 'w', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-bold text-center text-sm" placeholder="0.0" /></div>
+                                    <div className="flex-1 sm:w-24 order-3"><label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">สูง ({unit === 'cm' ? 'ซม.' : 'นิ้ว'})</label><input type="number" value={item.h} onChange={e=>updateItemParams(loc.id, item.id, 'h', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-bold text-center text-sm" placeholder="0.0" /></div>
+                                    <div className="w-16 order-4"><label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">จำนวน</label><input type="number" value={item.qty} onChange={e=>updateItemParams(loc.id, item.id, 'qty', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-bold text-center text-sm" /></div>
+                                    <button onClick={()=>removeItem(loc.id, item.id)} className="w-10 h-[38px] flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition shrink-0 order-5 mb-0.5"><Trash weight="fill" /></button>
                                 </div>
                             ))}
                         </div>
@@ -339,10 +339,10 @@ export default function CalculatorNewPage() {
             </div>
 
             {/* BOTTOM ACTION BAR */}
-            <div className="fixed bottom-[72px] md:bottom-0 left-0 right-0 bg-blue-950 p-4 md:p-5 flex justify-center items-center gap-3 z-40 border-t border-blue-900 shadow-[0_-10px_30px_rgba(0,0,0,0.2)] md:pl-72 no-print">
-               <button onClick={saveSession} className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg transition text-base flex justify-center items-center gap-2"><FloppyDisk weight="bold" /> บันทึก</button>
-               <button onClick={calculateSales} className="bg-emerald-500 hover:bg-emerald-400 text-white px-8 py-3.5 rounded-xl font-bold shadow-lg shadow-emerald-900/20 transition hover:-translate-y-0.5 text-base sm:text-lg flex-1 max-w-sm flex justify-center items-center gap-2"><Scissors weight="bold" /> วางแผนตัด (Job Sheet)</button>
-            </div>
+  <div className="fixed bottom-[72px] md:bottom-0 left-0 right-0 bg-blue-950 p-3 md:p-5 flex justify-center items-center gap-2 md:gap-3 z-40 border-t border-blue-900 shadow-[0_-10px_30px_rgba(0,0,0,0.2)] md:pl-72 no-print">
+     <button onClick={saveSession} className="bg-blue-600 hover:bg-blue-500 text-white px-4 md:px-6 py-3 md:py-3.5 rounded-xl font-bold shadow-lg transition text-sm md:text-base flex justify-center items-center gap-2 shrink-0"><FloppyDisk weight="bold" /> <span className="hidden xs:inline">บันทึก</span></button>
+     <button onClick={calculateSales} className="bg-emerald-500 hover:bg-emerald-400 text-white px-4 md:px-8 py-3 md:py-3.5 rounded-xl font-bold shadow-lg shadow-emerald-900/20 transition hover:-translate-y-0.5 text-sm sm:text-lg flex-1 max-w-sm flex justify-center items-center gap-2"><Scissors weight="bold" /> วางแผนตัด <span className="hidden sm:inline">(Job Sheet)</span></button>
+  </div>
 
             {/* SALES MODAL */}
             {salesModalOpen && salesData && (

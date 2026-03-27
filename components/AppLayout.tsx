@@ -30,7 +30,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isMoreActive = mobileMoreNav.some(item => pathname.startsWith(item.id));
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-slate-50">
       {/* SIDEBAR (Desktop) */}
       <aside className="w-64 bg-blue-950 text-white hidden md:flex flex-col z-50 shadow-2xl p-5 border-r border-blue-900/50 no-print">
         <div className="flex items-center gap-3 mb-10 px-1 mt-2">
@@ -66,7 +66,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </button>
       </aside>
 
-      <main className="flex-1 overflow-y-auto relative p-4 pb-28 md:p-8 md:pb-8 bg-slate-50">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden relative p-4 pb-32 md:p-8 md:pb-8 bg-slate-50 w-full max-w-full">
         <header className="md:hidden bg-blue-950 p-4 shadow-lg shadow-blue-900/10 flex justify-between items-center sticky top-0 z-30 no-print mb-4 rounded-xl border border-blue-900/30">
           <div className="flex items-center gap-3">
              <div className="flex items-center justify-center p-0.5 border-[2px] border-white rounded-[5px] w-9 h-9 bg-blue-900 shrink-0">

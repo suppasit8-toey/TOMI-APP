@@ -11,6 +11,10 @@ export default function StockPage() {
   const [stocks, setStocks] = useState<any[]>([]);
   const [brands, setBrands] = useState<any[]>([]);
   const [filter, setFilter] = useState('ทั้งหมด');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('ทั้งหมด');
+  const [selectedType, setSelectedType] = useState('ทั้งหมด');
+  const [sortBy, setSortBy] = useState('newest');
   const [loading, setLoading] = useState(true);
 
   // Add Stock Modal
@@ -34,8 +38,26 @@ export default function StockPage() {
   };
 
   useEffect(() => { loadData(); }, []);
+  
+  const uniqueBrands = ['ทั้งหมด', ...Array.from(new Set(stocks.map(s => s.brand))).sort()];
+  const uniqueTypes = ['ทั้งหมด', ...Array.from(new Set(stocks.map(s => s.film_type))).filter(Boolean).sort()];
 
-  const filtered = filter === 'ทั้งหมด' ? stocks : stocks.filter(s => s.status === filter);
+  const filtered = stocks.filter(s => {
+    const matchStatus = filter === 'ทั้งหมด' || s.status === filter;
+    const matchSearch = !searchQuery || 
+      (s.film_code?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+       s.brand?.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchBrand = selectedBrand === 'ทั้งหมด' || s.brand === selectedBrand;
+    const matchType = selectedType === 'ทั้งหมด' || s.film_type === selectedType;
+    
+    return matchStatus && matchSearch && matchBrand && matchType;
+  }).sort((a, b) => {
+    if (sortBy === 'newest') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    if (sortBy === 'oldest') return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    if (sortBy === 'most_remain') return b.remaining_length - a.remaining_length;
+    if (sortBy === 'least_remain') return a.remaining_length - b.remaining_length;
+    return 0;
+  });
 
   const submitAdd = async () => {
     if (!form.brand || !form.code || !form.price) return Swal.fire('เตือน', 'กรุณากรอกข้อมูลให้ครบ', 'warning');
@@ -139,12 +161,81 @@ export default function StockPage() {
         </button>
       </div>
       
-      <div className="flex gap-2 mb-3">
+      <div className="flex flex-col md:flex-row gap-3 mb-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm no-print">
+        <div className="flex-1 relative">
+          <input 
+            type="text" 
+            placeholder="ค้นหารหัสหรือยี่ห้อ..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700"
+          />
+          <svg className="w-5 h-5 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.4" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          {searchQuery && (
+            <button onClick={() => setSearchQuery('')} className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex gap-2">
+          <select 
+            value={selectedBrand} 
+            onChange={(e) => setSelectedBrand(e.target.value)}
+            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold text-slate-700 text-xs sm:text-sm appearance-none"
+            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px', paddingRight: '40px' }}
+          >
+            <option value="ทั้งหมด">📦 แบรนด์: ทั้งหมด</option>
+            {uniqueBrands.filter(b => b !== 'ทั้งหมด').map(b => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
+          
+          <select 
+            value={selectedType} 
+            onChange={(e) => setSelectedType(e.target.value)}
+            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold text-slate-700 text-xs sm:text-sm appearance-none"
+            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px', paddingRight: '40px' }}
+          >
+            <option value="ทั้งหมด">🎞️ ประเภท: ทั้งหมด</option>
+            {uniqueTypes.filter(t => t !== 'ทั้งหมด').map(t => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+
+          <select 
+            value={sortBy} 
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold text-slate-700 text-xs sm:text-sm appearance-none sm:col-span-2 lg:col-span-1"
+            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px', paddingRight: '40px' }}
+          >
+            <option value="newest">📅 ใหม่สุด - เก่าสุด</option>
+            <option value="oldest">📅 เก่าสุด - ใหม่สุด</option>
+            <option value="most_remain">📏 เหลือเยอะสุด</option>
+            <option value="least_remain">📏 เหลือน้อยสุด</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="flex gap-2 mb-3 items-center overflow-x-auto pb-1 no-scrollbar no-print">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mr-2 whitespace-nowrap">สถานะ:</span>
         {['ทั้งหมด', 'มีของ', 'หมด'].map(f => (
-          <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-full text-sm font-bold transition shadow-sm border ${filter === f ? (f === 'ทั้งหมด' ? 'bg-slate-800 text-white border-slate-800' : f === 'มีของ' ? 'bg-green-600 text-white border-green-600' : 'bg-red-600 text-white border-red-600') : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}>
+          <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-full text-xs font-bold transition shadow-sm border whitespace-nowrap ${filter === f ? (f === 'ทั้งหมด' ? 'bg-slate-800 text-white border-slate-800' : f === 'มีของ' ? 'bg-green-600 text-white border-green-600' : 'bg-red-600 text-white border-red-600') : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}>
             {f}
           </button>
         ))}
+        {(searchQuery || selectedBrand !== 'ทั้งหมด' || selectedType !== 'ทั้งหมด' || filter !== 'ทั้งหมด' || sortBy !== 'newest') && (
+           <button 
+             onClick={() => { setSearchQuery(''); setSelectedBrand('ทั้งหมด'); setSelectedType('ทั้งหมด'); setFilter('ทั้งหมด'); setSortBy('newest'); }}
+             className="text-[10px] font-bold text-red-500 hover:underline ml-2"
+           >
+             ล้างตัวกรอง
+           </button>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">

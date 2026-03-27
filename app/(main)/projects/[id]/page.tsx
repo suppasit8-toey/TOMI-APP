@@ -320,8 +320,8 @@ export default function ProjectDetailPage() {
   }, 0);
 
   return (
-    <div className="flex flex-col h-full absolute inset-0 bg-slate-50 z-40 overflow-y-auto">
-      <div className="sticky top-0 bg-white/95 backdrop-blur-sm p-4 border-b flex justify-between items-center shadow-sm z-10 w-full">
+    <div className="flex flex-col h-full absolute inset-0 bg-slate-50 z-40 overflow-y-auto outline-none no-scrollbar">
+      <div className="sticky top-0 bg-white border-b flex justify-between items-center shadow-sm z-50 w-full p-3 sm:p-4">
         <button onClick={() => router.back()} className="bg-slate-100 text-slate-600 hover:bg-slate-200 px-4 py-2 rounded-lg font-bold flex items-center transition">
           <ArrowLeft weight="bold" className="mr-2" /> กลับ
         </button>

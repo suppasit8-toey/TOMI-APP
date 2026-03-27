@@ -175,8 +175,8 @@ export default function AccountsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mt-4 text-sm">
-        <table className="w-full text-left">
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-x-auto mt-4 text-sm no-scrollbar">
+        <table className="w-full text-left min-w-[320px]">
           <thead className="bg-slate-50 border-b border-slate-100">
             <tr>
               <th className="py-4 px-4 font-bold text-slate-600 w-16 text-center">วันที่</th>

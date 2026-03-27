@@ -31,10 +31,22 @@
 }
 
 @layer base {
+  *, ::before, ::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    @apply font-sans antialiased min-h-screen;
+    @apply font-sans antialiased min-h-screen overscroll-behavior-y-none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

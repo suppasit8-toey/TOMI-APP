@@ -239,14 +239,16 @@ export default function QuotationCreatePage() {
                 const doc = new jsPDF('p', 'mm', 'a4');
                 const iH = (el.scrollHeight * 190) / 850;
                 doc.addImage(iData, 'JPEG', 10, 10, 190, iH);
-                doc.save(`Quotation_${custName || 'Draft'}.pdf`);
+                
+                // PREVIEW PDF
+                const pdfBlob = doc.output('blob');
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+                window.open(pdfUrl, '_blank');
             } else {
-                const link = document.createElement('a');
-                link.download = `Quotation_${custName || 'Draft'}.jpg`;
-                link.href = iData;
-                link.click();
+                // PREVIEW IMAGE
+                setPreviewImg(iData);
             }
-            Swal.fire('สำเร็จ', 'บันทึกเอกสารเรียบร้อย', 'success');
+            Swal.fire({ title: 'สร้างเอกสารเสร็จแล้ว', text: type === 'pdf' ? 'ระบบเปิดไฟล์ PDF ในหน้าต่างใหม่แล้ว' : 'แสดงตัวอย่างรูปภาพแล้ว', icon: 'success', timer: 2000, showConfirmButton: false });
         } catch (e: any) {
             console.error(e);
             const el = document.getElementById('quote-print-template');
@@ -254,6 +256,8 @@ export default function QuotationCreatePage() {
             Swal.fire('ผิดพลาด', 'ไม่สามารถสร้างเอกสารได้: ' + (e.message || ''), 'error');
         }
     };
+
+    const [previewImg, setPreviewImg] = useState<string | null>(null);
 
     // Running line number for print template
     let printLineNo = 0;
@@ -512,6 +516,26 @@ export default function QuotationCreatePage() {
                     </div>
                 </div>
             </div>
+            {/* IMAGE PREVIEW MODAL */}
+            {previewImg && (
+                <div className="fixed inset-0 bg-black/90 z-[100] flex flex-col items-center justify-center p-4 animate-in fade-in duration-300" onClick={() => setPreviewImg(null)}>
+                    <div className="max-w-4xl w-full h-full flex flex-col gap-4" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-center text-white">
+                            <h3 className="font-bold text-lg">ตัวอย่างรูปภาพ (กดค้างที่รูปเพื่อบันทึก)</h3>
+                            <button onClick={() => setPreviewImg(null)} className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition">ปิด</button>
+                        </div>
+                        <div className="flex-1 overflow-auto bg-white rounded-2xl flex justify-center p-2 shadow-2xl no-scrollbar">
+                           <img src={previewImg} alt="Preview" className="max-w-none w-full h-auto object-contain" />
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={() => setPreviewImg(null)} className="flex-1 bg-white/10 text-white font-bold py-3 rounded-xl hover:bg-white/20 transition">ยกเลิก</button>
+                            <a href={previewImg} download={`Quotation_${custName || 'Draft'}.jpg`} className="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-500 transition text-center flex items-center justify-center gap-2">
+                                <DownloadSimple weight="bold" /> ดาวน์โหลดเก็บไว้
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
