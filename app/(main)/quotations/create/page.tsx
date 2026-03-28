@@ -210,13 +210,13 @@ export default function QuotationCreatePage() {
         if (!editId) router.push(`/quotations/create?id=${qId}`);
     };
 
-    const generateQuote = async (type: 'pdf' | 'img') => {
+    const generateQuote = async () => {
         // @ts-ignore
         if (typeof window === 'undefined' || !window.domtoimage) {
             Swal.fire('รอสักครู่', 'ระบบกำลังโหลดโมดูลทำเอกสาร กรุณารอสักครู่แล้วกดใหม่ครับ', 'warning');
             return;
         }
-        Swal.fire({ title: `กำลังสร้าง ${type === 'pdf' ? 'PDF' : 'Image'}...`, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'กำลังเตรียมเอกสาร...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         try {
             const el = document.getElementById('quote-print-template');
             if (!el) throw new Error('Template not found');
@@ -225,36 +225,45 @@ export default function QuotationCreatePage() {
             el.style.top = '0';
             el.style.zIndex = '-1';
             el.style.opacity = '1';
-            await new Promise(r => setTimeout(r, 300));
+            
+            // Scale up for sharpness
+            el.style.transform = 'scale(2)';
+            el.style.transformOrigin = 'top left';
+            
+            await new Promise(r => setTimeout(r, 500));
             // @ts-ignore
-            const iData = await window.domtoimage.toJpeg(el, { bgcolor: '#ffffff', quality: 0.98, width: 850, height: el.scrollHeight });
+            const iData = await window.domtoimage.toJpeg(el, { 
+                bgcolor: '#ffffff', 
+                quality: 1.0, 
+                width: 850 * 2, 
+                height: el.scrollHeight * 2 
+            });
+            el.style.transform = '';
             el.style.position = 'absolute';
             el.style.left = '-9999px';
             el.style.zIndex = '';
             el.style.opacity = '';
 
-            if (type === 'pdf') {
-                // @ts-ignore
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'mm', 'a4');
-                const iH = (el.scrollHeight * 190) / 850;
-                doc.addImage(iData, 'JPEG', 10, 10, 190, iH);
-                
-                // PREVIEW PDF
-                const pdfBlob = doc.output('blob');
-                const pdfUrl = URL.createObjectURL(pdfBlob);
-                window.open(pdfUrl, '_blank');
-            } else {
-                // PREVIEW IMAGE
-                setPreviewImg(iData);
-            }
-            Swal.fire({ title: 'สร้างเอกสารเสร็จแล้ว', text: type === 'pdf' ? 'ระบบเปิดไฟล์ PDF ในหน้าต่างใหม่แล้ว' : 'แสดงตัวอย่างรูปภาพแล้ว', icon: 'success', timer: 2000, showConfirmButton: false });
+            setPreviewImg(iData);
+            Swal.close();
         } catch (e: any) {
             console.error(e);
             const el = document.getElementById('quote-print-template');
-            if (el) { el.style.position = 'absolute'; el.style.left = '-9999px'; }
+            if (el) { el.style.position = 'absolute'; el.style.left = '-9999px'; el.style.transform = ''; }
             Swal.fire('ผิดพลาด', 'ไม่สามารถสร้างเอกสารได้: ' + (e.message || ''), 'error');
         }
+    };
+
+    const downloadAsPDF = () => {
+        if (!previewImg) return;
+        // @ts-ignore
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const el = document.getElementById('quote-print-template');
+        const iH = ((el?.scrollHeight || 1100) * 190) / 850;
+        doc.addImage(previewImg, 'JPEG', 10, 10, 190, iH);
+        doc.save(`Quotation_${custName || 'Draft'}.pdf`);
+        Swal.fire({ title: 'ดาวน์โหลดสำเร็จ', text: 'ระบบกำลังดาวน์โหลดไฟล์ PDF...', icon: 'success', timer: 2000, showConfirmButton: false });
     };
 
     const [previewImg, setPreviewImg] = useState<string | null>(null);
@@ -414,11 +423,8 @@ export default function QuotationCreatePage() {
                 <button onClick={saveQuotation} disabled={saving} className="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg transition w-full sm:max-w-[220px] flex justify-center items-center gap-2 text-base disabled:opacity-50">
                     <FloppyDisk weight="bold" /> {saving ? 'บันทึก...' : 'บันทึก'}
                 </button>
-                <button onClick={() => generateQuote('pdf')} className="bg-red-500 hover:bg-red-400 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg transition w-full sm:max-w-[220px] flex justify-center items-center gap-2 text-base">
-                    <DownloadSimple weight="bold" /> PDF
-                </button>
-                <button onClick={() => generateQuote('img')} className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg transition w-full sm:max-w-[220px] flex justify-center items-center gap-2 text-base">
-                    <DownloadSimple weight="bold" /> รูปภาพ
+                <button onClick={generateQuote} className="bg-blue-500 hover:bg-blue-400 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg transition w-full sm:max-w-[400px] flex justify-center items-center gap-2 text-base">
+                    <DownloadSimple weight="bold" /> สร้างเอกสาร (PDF / รูปภาพ)
                 </button>
             </div>
 
@@ -527,10 +533,13 @@ export default function QuotationCreatePage() {
                         <div className="flex-1 overflow-auto bg-white rounded-2xl flex justify-center p-2 shadow-2xl no-scrollbar">
                            <img src={previewImg} alt="Preview" className="max-w-none w-full h-auto object-contain" />
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex flex-col sm:flex-row gap-3">
                             <button onClick={() => setPreviewImg(null)} className="flex-1 bg-white/10 text-white font-bold py-3 rounded-xl hover:bg-white/20 transition">ยกเลิก</button>
+                            <button onClick={downloadAsPDF} className="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-500 transition text-center flex items-center justify-center gap-2">
+                                <Receipt weight="bold" /> ดาวน์โหลด PDF
+                            </button>
                             <a href={previewImg} download={`Quotation_${custName || 'Draft'}.jpg`} className="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-500 transition text-center flex items-center justify-center gap-2">
-                                <DownloadSimple weight="bold" /> ดาวน์โหลดเก็บไว้
+                                <DownloadSimple weight="bold" /> ดาวน์โหลด รูปภาพ
                             </a>
                         </div>
                     </div>

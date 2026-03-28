@@ -23,7 +23,7 @@ export default function AccountsPage() {
 
   const loadData = async () => {
     setLoading(true);
-    let query = supabase.from('accounts').select('*').order('transaction_date', { ascending: false });
+    let query = supabase.from('accounts').select('*, projects(name)').order('transaction_date', { ascending: false });
     const { data } = await query;
     setAccounts(data || []);
     setLoading(false);
@@ -136,7 +136,7 @@ export default function AccountsPage() {
         <h2 className="text-xl font-bold text-slate-800">บัญชีรายรับ-รายจ่าย</h2>
         <div className="flex gap-2">
           <Link href={`/report?year=${filterYear}&month=${filterMonth}`} target="_blank" className="bg-slate-100 text-slate-600 border border-slate-200 py-2 px-3 rounded-xl font-semibold shadow-sm gap-2 flex items-center hover:-translate-y-0.5 transition hover:bg-slate-200">
-            <Printer weight="bold" /> <span className="hidden sm:inline">พิมพ์</span>
+            <Printer weight="bold" /> <span className="hidden sm:inline">รายงาน</span>
           </Link>
           <button onClick={() => setShowAdd(true)} className="bg-blue-600 text-white py-2 px-4 rounded-xl font-semibold shadow-lg shadow-blue-200 gap-2 flex items-center hover:-translate-y-0.5 transition hover:bg-blue-700">
             <Plus weight="bold" /> เพิ่มรายการ
@@ -204,6 +204,9 @@ export default function AccountsPage() {
                 <td className="py-3 px-4">
                   <div className="font-bold text-slate-800 leading-snug">{acc.detail || '-'}</div>
                   <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                    {acc.projects?.name && (
+                      <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-bold border border-blue-100">Project: {acc.projects.name}</span>
+                    )}
                     <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md font-bold">{acc.category}</span>
                     <span className="text-[10px] text-slate-400 flex items-center">
                       <PencilSimple weight="fill" className="mr-0.5" /> {acc.created_by}

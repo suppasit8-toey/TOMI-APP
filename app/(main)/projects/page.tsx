@@ -85,7 +85,7 @@ export default function ProjectsPage() {
         </button>
       </div>
       
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 w-full">
         {filterOptions.map(f => {
           const count = f === 'ทั้งหมด' ? projects.length : projects.filter(p => p.status === f).length;
           const isActive = filter === f;
@@ -99,11 +99,11 @@ export default function ProjectsPage() {
         })}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-4 w-full">
         {filtered.map(p => (
-          <div key={p.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-300 hover:shadow-md transition group relative">
-            <div className="flex justify-between items-start mb-3">
-              <h3 onClick={() => router.push(`/projects/${p.id}`)} className="font-bold text-lg text-slate-800 leading-tight flex-1 mr-2 group-hover:text-blue-600 transition truncate cursor-pointer">{p.name}</h3>
+          <div key={p.id} className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-300 hover:shadow-md transition group relative">
+            <div className="flex justify-between items-start mb-3 min-w-0">
+              <h3 onClick={() => router.push(`/projects/${p.id}`)} className="font-bold text-lg text-slate-800 leading-tight flex-1 mr-2 group-hover:text-blue-600 transition truncate cursor-pointer min-w-0">{p.name}</h3>
               <div className="flex items-center gap-2 shrink-0">
                 <span className={`px-2 py-1 rounded-full text-[11px] font-bold whitespace-nowrap ${getStatusColor(p.status)}`}>{p.status}</span>
                 <button onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === p.id ? null : p.id); }} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition">
