@@ -72,7 +72,8 @@ function ReportContent() {
   })();
 
   return (
-    <div className="bg-white text-black p-8 max-w-[210mm] mx-auto min-h-screen print:p-0 print:m-0 print:shadow-none shadow-2xl mt-8 mb-8 print:mt-0 print:mb-0">
+    <div className="bg-slate-100 min-h-screen py-4 md:py-8 overflow-x-auto print:bg-white print:py-0 no-scrollbar">
+      <div className="bg-white text-black p-6 md:p-12 w-[210mm] min-w-[210mm] mx-auto min-h-[297mm] shadow-2xl print:p-0 print:m-0 print:shadow-none print:w-full print:min-w-0">
       <div className="text-center mb-8 border-b-2 border-black pb-4">
         <h1 className="text-2xl font-black mb-1 tracking-wide uppercase font-sans">TOMI FILM (สรุปบัญชีรายรับ-รายจ่าย)</h1>
         <p className="text-lg font-bold">รายงานประจำรอบเดือน: <span className="text-blue-600">{mName}</span></p>
@@ -190,6 +191,7 @@ function ReportContent() {
 
       <div className="mt-8 text-center text-xs text-gray-400 no-print">
         <button onClick={() => window.print()} className="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-black transition">🖨 พิมพ์รายงาน</button>
+        </div>
       </div>
     </div>
   );

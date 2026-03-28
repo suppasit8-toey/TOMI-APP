@@ -77,7 +77,7 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-500" onClick={() => menuOpenId && setMenuOpenId(null)}>
+    <div className="space-y-4 animate-in fade-in duration-500 max-w-full overflow-x-hidden" onClick={() => menuOpenId && setMenuOpenId(null)}>
       <div className="flex justify-between items-center mb-2 no-print">
         <h2 className="text-xl font-bold text-slate-800">โปรเจกต์</h2>
         <button onClick={() => setShowAdd(true)} className="bg-blue-600 text-white py-2 px-4 rounded-xl font-semibold shadow-lg shadow-blue-200 gap-2 flex items-center hover:-translate-y-0.5 transition hover:bg-blue-700">
@@ -101,7 +101,7 @@ export default function ProjectsPage() {
 
       <div className="grid md:grid-cols-2 gap-4 w-full">
         {filtered.map(p => (
-          <div key={p.id} className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-300 hover:shadow-md transition group relative">
+          <div key={p.id} className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-300 hover:shadow-md transition group relative min-w-0">
             <div className="flex justify-between items-start mb-3 min-w-0">
               <h3 onClick={() => router.push(`/projects/${p.id}`)} className="font-bold text-lg text-slate-800 leading-tight flex-1 mr-2 group-hover:text-blue-600 transition truncate cursor-pointer min-w-0">{p.name}</h3>
               <div className="flex items-center gap-2 shrink-0">
