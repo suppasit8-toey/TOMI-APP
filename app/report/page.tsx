@@ -72,7 +72,7 @@ function ReportContent() {
   })();
 
   return (
-    <div className="bg-slate-100 min-h-screen py-4 md:py-8 overflow-x-auto print:bg-white print:py-0 no-scrollbar">
+    <div className="bg-slate-100 min-h-screen py-4 md:py-8 print:bg-white print:py-0">
       <div className="bg-white text-black p-6 md:p-12 w-[210mm] min-w-[210mm] mx-auto min-h-[297mm] shadow-2xl print:p-0 print:m-0 print:shadow-none print:w-full print:min-w-0">
       <div className="text-center mb-8 border-b-2 border-black pb-4">
         <h1 className="text-2xl font-black mb-1 tracking-wide uppercase font-sans">TOMI FILM (สรุปบัญชีรายรับ-รายจ่าย)</h1>

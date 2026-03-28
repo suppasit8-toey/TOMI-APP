@@ -30,9 +30,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isMoreActive = mobileMoreNav.some(item => pathname.startsWith(item.id));
 
   return (
-    <div className="flex h-[100dvh] w-full overflow-hidden bg-slate-50">
+    <div className="flex bg-slate-50">
       {/* SIDEBAR (Desktop) */}
-      <aside className="w-64 bg-blue-950 text-white hidden md:flex flex-col z-50 shadow-2xl p-5 border-r border-blue-900/50 no-print">
+      <aside className="w-64 bg-blue-950 text-white hidden md:flex flex-col z-50 shadow-2xl p-5 border-r border-blue-900/50 no-print sticky top-0 h-screen">
         <div className="flex items-center gap-3 mb-10 px-1 mt-2">
           <div className="flex items-center justify-center p-0.5 border-[2.5px] border-white rounded-[7px] w-12 h-12 shadow-[0_0_15px_rgba(255,255,255,0.15)] bg-gradient-to-br from-blue-800 to-blue-950 shrink-0">
             <SquaresFour weight="regular" className="text-white text-3xl" />
