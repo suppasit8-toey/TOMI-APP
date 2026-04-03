@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import LoginScreen from './LoginScreen';
 
 type User = { id: string; name: string; avatar: string; role: string; user_code?: string } | null;
@@ -37,6 +38,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('tomi_user');
   };
 
+  const pathname = usePathname();
+
   if (loading) {
     return (
       <div className="fixed inset-0 bg-white z-[9999] flex justify-center items-center flex-col">
@@ -45,9 +48,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
+  const isPublicRoute = pathname === '/';
+
   return (
     <AuthContext.Provider value={{ user, setUser, logout }}>
-      {user ? children : <LoginScreen />}
+      {user || isPublicRoute ? children : <LoginScreen />}
     </AuthContext.Provider>
   );
 }

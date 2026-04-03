@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from './AuthProvider';
 import { usePathname } from 'next/navigation';
-import { SquaresFour, Briefcase, Scroll, Wallet, SignOut, Storefront, Tag, Calculator, Receipt, DotsThree, X } from '@phosphor-icons/react';
+import { SquaresFour, Briefcase, Scroll, Wallet, SignOut, Storefront, Tag, Calculator, Receipt, DotsThree, X, Globe } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 const navItems = [
@@ -14,7 +14,8 @@ const navItems = [
   { id: '/suppliers', label: 'ซัพพลายเออร์', icon: Storefront },
   { id: '/brands', label: 'แบรนด์ฟิล์ม', icon: Tag },
   { id: '/calculator', label: 'คำนวณฟิล์ม', icon: Calculator },
-  { id: '/quotations', label: 'ใบเสนอราคา', icon: Receipt }
+  { id: '/quotations', label: 'ใบเสนอราคา', icon: Receipt },
+  { id: '/website-manager', label: 'จัดการเว็บไซต์', icon: Globe }
 ];
 
 // First 4 items show on mobile bottom bar
