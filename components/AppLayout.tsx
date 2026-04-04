@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from './AuthProvider';
 import { usePathname } from 'next/navigation';
-import { SquaresFour, Briefcase, Scroll, Wallet, SignOut, Storefront, Tag, Calculator, Receipt, DotsThree, X, Globe } from '@phosphor-icons/react';
+import { SquaresFour, Briefcase, Scroll, Wallet, SignOut, Storefront, Tag, Calculator, Receipt, DotsThree, X, Globe, List } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 const navItems = [
@@ -26,6 +26,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { logout } = useAuth();
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Close drawer on route change
+  useEffect(() => {
+    setDrawerOpen(false);
+    setMoreOpen(false);
+  }, [pathname]);
 
   // Check if any "more" item is active
   const isMoreActive = mobileMoreNav.some(item => pathname.startsWith(item.id));
@@ -67,9 +74,59 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </button>
       </aside>
 
+      {/* MOBILE SIDEBAR DRAWER */}
+      {drawerOpen && (
+        <div className="md:hidden fixed inset-0 z-[70]">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
+          {/* Drawer Panel */}
+          <aside className="absolute top-0 left-0 bottom-0 w-72 bg-blue-950 text-white flex flex-col p-5 shadow-2xl animate-in slide-in-from-left duration-300">
+            <div className="flex items-center justify-between mb-8 mt-1">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center p-0.5 border-[2.5px] border-white rounded-[7px] w-11 h-11 shadow-[0_0_15px_rgba(255,255,255,0.15)] bg-gradient-to-br from-blue-800 to-blue-950 shrink-0">
+                  <SquaresFour weight="regular" className="text-white text-2xl" />
+                </div>
+                <div className="flex flex-col shrink-0">
+                  <h1 className="font-extrabold text-[20px] leading-[1.1] tracking-widest text-white drop-shadow-md pb-[2px]">TOMI</h1>
+                  <h1 className="font-extrabold text-[20px] leading-[1] tracking-widest text-white drop-shadow-md">FILM</h1>
+                </div>
+              </div>
+              <button onClick={() => setDrawerOpen(false)} className="text-blue-300 hover:text-white hover:bg-blue-800 p-2 rounded-xl transition">
+                <X weight="bold" className="text-xl" />
+              </button>
+            </div>
+            
+            <nav className="flex-1 overflow-y-auto">
+              {navItems.map(item => {
+                const Icon = item.icon;
+                const isActive = pathname.startsWith(item.id);
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.id}
+                    onClick={() => setDrawerOpen(false)}
+                    className={`flex items-center gap-4 p-3.5 rounded-xl cursor-pointer transition-all mb-2 font-medium ${isActive ? 'bg-blue-600/90 text-white shadow-lg shadow-blue-900/50 border border-blue-500/30' : 'text-blue-200/80 hover:bg-blue-900/40 hover:text-white'}`}
+                  >
+                    <Icon weight={isActive ? "fill" : "regular"} className={`text-2xl ${isActive ? 'text-white' : 'text-blue-300/80'}`} />
+                    <span className="tracking-wide text-sm">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+            
+            <button onClick={() => { setDrawerOpen(false); logout(); }} className="mt-4 text-red-300 flex items-center px-4 py-3.5 hover:bg-red-950/40 rounded-xl transition w-full text-left font-medium border border-transparent hover:border-red-900/30">
+              <SignOut className="mr-3 text-xl" /> ออกจากระบบ
+            </button>
+          </aside>
+        </div>
+      )}
+
       <main className="flex-1 overflow-y-auto overflow-x-hidden relative p-4 pb-32 md:p-8 md:pb-8 bg-slate-50 w-full max-w-full">
         <header className="md:hidden bg-blue-950 p-4 shadow-lg shadow-blue-900/10 flex justify-between items-center sticky top-0 z-30 no-print mb-4 rounded-xl border border-blue-900/30">
           <div className="flex items-center gap-3">
+             <button onClick={() => setDrawerOpen(true)} className="text-white hover:bg-blue-800 p-2 rounded-xl transition cursor-pointer -ml-1">
+               <List weight="bold" className="text-xl" />
+             </button>
              <div className="flex items-center justify-center p-0.5 border-[2px] border-white rounded-[5px] w-9 h-9 bg-blue-900 shrink-0">
                <SquaresFour weight="regular" className="text-white text-xl" />
              </div>
