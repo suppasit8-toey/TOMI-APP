@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Phone, CalendarBlank, CaretRight, FolderDashed, Trash, PencilSimple, DotsThreeVertical } from '@phosphor-icons/react';
+import { Plus, Phone, CalendarBlank, CaretRight, FolderDashed, Trash, PencilSimple, DotsThreeVertical, MagnifyingGlass, Briefcase, ChartPie, TrendUp, FolderOpen } from '@phosphor-icons/react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
@@ -24,6 +24,7 @@ export default function ProjectsPage() {
   const [filter, setFilter] = useState('ทั้งหมด');
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [form, setForm] = useState({ name: '', tel: '', note: '' });
   const [editModal, setEditModal] = useState<any>(null);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
@@ -37,7 +38,8 @@ export default function ProjectsPage() {
 
   useEffect(() => { loadData(); }, []);
 
-  const filtered = filter === 'ทั้งหมด' ? projects : projects.filter(p => p.status === filter);
+  const filtered = (filter === 'ทั้งหมด' ? projects : projects.filter(p => p.status === filter))
+    .filter(p => !searchQuery || p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || p.tel?.includes(searchQuery));
 
   const submitPrj = async () => {
     if (!form.name) return Swal.fire('เตือน', 'กรุณาระบุชื่อโปรเจกต์', 'warning');
@@ -76,16 +78,76 @@ export default function ProjectsPage() {
     return new Date(date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
+  const activeCount = projects.filter(p => !['เสร็จสิ้น', 'ยกเลิก'].includes(p.status)).length;
+  const completedCount = projects.filter(p => p.status === 'เสร็จสิ้น').length;
+
   return (
     <div className="space-y-4 animate-in fade-in duration-500 max-w-full overflow-x-hidden" onClick={() => menuOpenId && setMenuOpenId(null)}>
-      <div className="flex justify-between items-center mb-2 no-print">
-        <h2 className="text-xl font-bold text-slate-800">โปรเจกต์</h2>
-        <button onClick={() => setShowAdd(true)} className="bg-blue-600 text-white py-2 px-4 rounded-xl font-semibold shadow-lg shadow-blue-200 gap-2 flex items-center hover:-translate-y-0.5 transition hover:bg-blue-700">
-          <Plus weight="bold" /> สร้าง
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2 no-print">
+        <div>
+          <h2 className="text-2xl md:text-3xl font-black text-slate-800 flex items-center gap-3 tracking-tight">
+            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
+              <Briefcase weight="fill" className="text-blue-600 text-xl" />
+            </div>
+            โปรเจกต์
+          </h2>
+          <p className="text-sm text-slate-400 mt-1 font-medium ml-[52px]">
+            จัดการโปรเจกต์ติดตั้งฟิล์มทั้งหมด
+          </p>
+        </div>
+        <button onClick={() => setShowAdd(true)} className="bg-blue-600 text-white py-2.5 px-5 rounded-xl font-bold shadow-lg shadow-blue-200 gap-2 flex items-center hover:-translate-y-0.5 transition hover:bg-blue-700">
+          <Plus weight="bold" /> สร้างโปรเจกต์
         </button>
       </div>
+
+      {/* Stats Bar */}
+      <div className="grid grid-cols-3 gap-3 no-print">
+        <div className="bg-white rounded-xl p-3.5 shadow-sm border border-slate-100 flex items-center gap-3">
+          <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
+            <FolderOpen weight="duotone" className="text-blue-500" />
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ทั้งหมด</div>
+            <div className="text-lg font-black text-slate-800 leading-none mt-0.5">{projects.length}</div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-3.5 shadow-sm border border-slate-100 flex items-center gap-3">
+          <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center border border-amber-100">
+            <TrendUp weight="duotone" className="text-amber-500" />
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">กำลังดำเนินการ</div>
+            <div className="text-lg font-black text-amber-600 leading-none mt-0.5">{activeCount}</div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-3.5 shadow-sm border border-slate-100 flex items-center gap-3">
+          <div className="w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center border border-green-100">
+            <ChartPie weight="duotone" className="text-green-500" />
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">เสร็จสิ้น</div>
+            <div className="text-lg font-black text-green-600 leading-none mt-0.5">{completedCount}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Search */}
+      <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 no-print">
+        <div className="relative">
+          <MagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="ค้นหาชื่อโปรเจกต์ หรือ เบอร์โทร..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700 text-sm"
+          />
+        </div>
+      </div>
       
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 w-full">
+      {/* Filter Pills */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 w-full no-print">
         {filterOptions.map(f => {
           const count = f === 'ทั้งหมด' ? projects.length : projects.filter(p => p.status === f).length;
           const isActive = filter === f;
@@ -127,6 +189,11 @@ export default function ProjectsPage() {
             <div className="space-y-2 mb-4 cursor-pointer" onClick={() => router.push(`/projects/${p.id}`)}>
               <div className="text-sm text-gray-500 flex items-center"><Phone weight="fill" className="mr-2 text-gray-400" /> {p.tel || '-'}</div>
               <div className="text-xs text-gray-400 flex items-center"><CalendarBlank weight="fill" className="mr-2" /> สร้าง: {formatDate(p.created_at)}</div>
+              {p.note && (
+                <div className="text-xs text-slate-500 bg-slate-50 rounded-lg p-2 border border-slate-100 line-clamp-2 mt-1">
+                  📝 {p.note}
+                </div>
+              )}
             </div>
             
             <div className="pt-3 border-t border-slate-100 flex justify-between items-center cursor-pointer" onClick={() => router.push(`/projects/${p.id}`)}>
@@ -149,7 +216,8 @@ export default function ProjectsPage() {
       {!loading && filtered.length === 0 && (
         <div className="text-center text-gray-400 py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-white flex flex-col items-center">
           <FolderDashed className="text-4xl mb-3 text-slate-300" />
-          <span className="font-medium">ไม่พบโปรเจกต์ในสถานะ &quot;{filter}&quot;</span>
+          <span className="font-medium">ไม่พบโปรเจกต์{filter !== 'ทั้งหมด' ? ` ในสถานะ "${filter}"` : ''}</span>
+          {searchQuery && <span className="text-sm mt-1">ลองเปลี่ยนคำค้นหา</span>}
         </div>
       )}
 
@@ -157,7 +225,15 @@ export default function ProjectsPage() {
       {showAdd && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowAdd(false)}>
           <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-xl mb-4 text-slate-800">สร้างโปรเจกต์</h3>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
+                <Briefcase weight="fill" className="text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-slate-800">สร้างโปรเจกต์ใหม่</h3>
+                <p className="text-xs text-slate-400 font-medium">เพิ่มโปรเจกต์ติดตั้งฟิล์มใหม่</p>
+              </div>
+            </div>
             <label className="block text-sm font-semibold text-slate-700 mb-1 mt-3">ชื่อโปรเจกต์ <span className="text-red-500">*</span></label>
             <input value={form.name} onChange={e=>setForm({...form, name: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition text-base" placeholder="ระบุชื่อโปรเจกต์" />
             <label className="block text-sm font-semibold text-slate-700 mb-1 mt-4">เบอร์โทรศัพท์</label>
@@ -176,7 +252,15 @@ export default function ProjectsPage() {
       {editModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setEditModal(null)}>
           <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-xl mb-4 text-slate-800">แก้ไขโปรเจกต์</h3>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center border border-amber-100">
+                <PencilSimple weight="fill" className="text-amber-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-slate-800">แก้ไขโปรเจกต์</h3>
+                <p className="text-xs text-slate-400 font-medium">อัปเดตข้อมูลโปรเจกต์</p>
+              </div>
+            </div>
             <label className="block text-sm font-semibold text-slate-700 mb-1 mt-3">ชื่อโปรเจกต์</label>
             <input value={editModal.name} onChange={e=>setEditModal({...editModal, name: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition text-base" />
             <label className="block text-sm font-semibold text-slate-700 mb-1 mt-4">เบอร์โทรศัพท์</label>
@@ -197,4 +281,3 @@ export default function ProjectsPage() {
     </div>
   );
 }
-

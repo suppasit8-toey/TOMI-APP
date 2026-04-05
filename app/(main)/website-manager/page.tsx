@@ -259,14 +259,18 @@ export default function WebsiteManager() {
   return (
     <div className="max-w-5xl mx-auto pb-16 animate-in fade-in zoom-in-95 duration-300">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-blue-100 text-blue-600 rounded-xl"><Globe weight="duotone" className="text-3xl" /></div>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">จัดการเว็บไซต์ (CMS)</h1>
-          <p className="text-slate-500 text-sm">ปรับแต่งข้อความ รูปภาพ และบทความสำหรับเว็บไซต์</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 no-print">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shrink-0">
+            <Globe weight="fill" className="text-blue-500 text-2xl" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">จัดการเว็บไซต์ (CMS)</h1>
+            <p className="text-sm text-slate-400 mt-0.5 font-medium">ปรับแต่งข้อความ รูปภาพ และบทความสำหรับเว็บไซต์</p>
+          </div>
         </div>
-        <a href="/" target="_blank" className="ml-auto inline-flex items-center gap-1.5 text-sm text-blue-500 hover:text-blue-700 font-medium">
-          <Eye weight="bold" /> ดูเว็บไซต์
+        <a href="/" target="_blank" className="bg-slate-100 text-slate-600 border border-slate-200 py-2.5 px-5 rounded-xl font-bold shadow-sm inline-flex items-center gap-2 hover:-translate-y-0.5 transition hover:bg-slate-200 w-full sm:w-auto justify-center">
+          <Eye weight="bold" className="text-lg" /> ดูเว็บไซต์
         </a>
       </div>
 

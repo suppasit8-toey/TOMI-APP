@@ -1,36 +1,33 @@
 'use client';
+
 import { useState, useEffect } from 'react';
-import { Plus, Tag, Trash, CaretRight } from '@phosphor-icons/react';
+import { Plus, Tag, MagnifyingGlass, Hash, ArrowRight, CaretRight, Eraser } from '@phosphor-icons/react';
 import { supabase } from '@/lib/supabase';
 import Swal from 'sweetalert2';
-import { useAuth } from '@/components/AuthProvider';
 import Link from 'next/link';
 
-export default function FilmBrandsPage() {
-  const { user } = useAuth();
+export default function BrandsPage() {
   const [brands, setBrands] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ name: '', note: '' });
+  const [newBrand, setNewBrand] = useState('');
+  const [search, setSearch] = useState('');
 
   const loadData = async () => {
     setLoading(true);
-    const { data } = await supabase.from('film_brands').select('*').order('created_at', { ascending: false });
+    const { data } = await supabase.from('film_brands').select('*').order('name', { ascending: true });
     setBrands(data || []);
     setLoading(false);
   };
 
   useEffect(() => { loadData(); }, []);
 
-  const submitAdd = async () => {
-    if (!form.name) return Swal.fire('เตือน', 'กรุณาระบุชื่อแบรนด์ฟิล์ม', 'warning');
+  const addBrand = async () => {
+    if (!newBrand.trim()) return Swal.fire('เตือน', 'กรุณาระบุชื่อแบรนด์', 'warning');
     setLoading(true);
-    
-    const id = 'FB' + new Date().getTime();
-    const { error } = await supabase.from('film_brands').insert({
-      id,
-      name: form.name,
-      note: form.note
+    const { error } = await supabase.from('film_brands').insert({ 
+      id: 'B' + new Date().getTime(),
+      name: newBrand.trim() 
     });
 
     if (error) {
@@ -38,90 +35,116 @@ export default function FilmBrandsPage() {
       return Swal.fire('ผิดพลาด', error.message, 'error');
     }
 
-    await supabase.from('app_logs').insert({ action_by: user?.name, action_type: 'ADD_FILM_BRAND', description: `เพิ่มแบรนด์ฟิล์ม ${form.name}`, ref_id: id });
-    
-    Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย', 'success');
+    Swal.fire('สำเร็จ', 'เพิ่มแบรนด์ฟิล์มแล้ว', 'success');
     setShowAdd(false);
-    setForm({ name: '', note: '' });
+    setNewBrand('');
     loadData();
   };
-
-  const deleteBrand = async (id: string, name: string) => {
-    const res = await Swal.fire({
-      title: 'ลบแบรนด์ฟิล์ม?',
-      text: `คุณต้องการลบแบรนด์ "${name}" ใช่หรือไม่? (รุ่นฟิล์มและราคาที่ผูกไว้จะถูกลบไปด้วย)`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#94a3b8',
-      confirmButtonText: 'ลบทิ้ง',
-      cancelButtonText: 'ยกเลิก'
-    });
-    
-    if (res.isConfirmed) {
-      setLoading(true);
-      await supabase.from('film_brands').delete().eq('id', id);
-      await supabase.from('app_logs').insert({ action_by: user?.name, action_type: 'DEL_FILM_BRAND', description: `ลบแบรนด์ฟิล์ม ${name}`, ref_id: id });
-      Swal.fire('ลบแล้ว!', 'ข้อมูลถูกลบเรียบร้อย', 'success');
-      loadData();
-    }
-  };
+  
+  const filtered = brands.filter(b => b.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-500">
-      <div className="flex justify-between items-center mb-4 no-print">
-        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-           <Tag weight="fill" className="text-blue-600 text-2xl" /> แบรนด์ฟิล์ม (Film Brands)
-        </h2>
-        <button onClick={() => setShowAdd(true)} className="bg-blue-600 text-white py-2 px-4 rounded-xl font-semibold shadow-lg shadow-blue-200 gap-2 flex items-center hover:-translate-y-0.5 transition hover:bg-blue-700">
-          <Plus weight="bold" /> เพิ่มแบรนด์
+    <div className="space-y-6 animate-in fade-in duration-500 max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 no-print">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center border border-pink-100 shrink-0 shadow-sm">
+            <Tag weight="fill" className="text-pink-500 text-2xl" />
+          </div>
+          <div>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">แบรนด์ฟิล์ม</h2>
+            <p className="text-sm text-slate-400 mt-0.5 font-medium flex items-center gap-1.5">
+              จัดการรายการยี่ห้อฟิล์มทั้งหมด <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded font-bold">{brands.length} แบรนด์</span>
+            </p>
+          </div>
+        </div>
+        <button onClick={() => setShowAdd(true)} className="bg-blue-600 text-white py-2.5 px-6 rounded-xl font-bold shadow-lg shadow-blue-600/30 gap-2 flex items-center hover:-translate-y-0.5 transition hover:bg-blue-700 w-full md:w-auto justify-center">
+          <Plus weight="bold" /> เพิ่มแบรนด์ใหม่
         </button>
       </div>
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {brands.map(b => (
-          <Link href={`/brands/${encodeURIComponent(b.name)}`} key={b.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group transition hover:shadow-md hover:border-blue-300 block">
-            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition z-10">
-               <button onClick={(e) => { e.preventDefault(); deleteBrand(b.id, b.name); }} className="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition"><Trash weight="fill" /></button>
-            </div>
-            
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl border border-blue-100 shrink-0">
-                 <Tag weight="duotone" />
-              </div>
-              <div className="flex-1">
-                 <div className="font-bold text-lg text-slate-800 leading-tight">{b.name}</div>
-                 <div className="text-xs text-slate-400 mt-0.5 line-clamp-1">{b.note || 'ไม่มีหมายเหตุ'}</div>
-              </div>
-              <CaretRight weight="bold" className="text-slate-300 group-hover:text-blue-500 transition" />
-            </div>
-          </Link>
-        ))}
-        {brands.length === 0 && !loading && (
-          <div className="col-span-full py-16 text-center text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">
-             <Tag className="text-5xl mx-auto mb-3 text-slate-300" />
-             <p className="font-semibold text-lg">ยังไม่มีข้อมูลแบรนด์ฟิล์ม</p>
-             <p className="text-sm">กดเพิ่มข้อมูลที่ปุ่มมุมขวาบนได้เลย</p>
-          </div>
-        )}
+      
+      {/* Search */}
+      <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200">
+        <div className="relative">
+          <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
+          <input 
+            type="text" 
+            placeholder="ค้นหาชื่อแบรนด์..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-slate-700 text-sm"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 flex items-center justify-center bg-slate-200 rounded-full p-0.5">
+              <Plus className="rotate-45" weight="bold" />
+            </button>
+          )}
+        </div>
       </div>
 
+      {loading ? (
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="py-24 text-center bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
+           <Tag className="text-7xl mx-auto mb-4 text-slate-200" weight="thin" />
+           <p className="font-black text-slate-400 text-xl">ไม่พบข้อมูลแบรนด์ฟิล์ม</p>
+           <p className="text-slate-400 text-sm mt-1">ลองเปลี่ยนคำค้นหา หรือเพิ่มแบรนด์ใหม่</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filtered.map(b => (
+            <Link href={`/brands/${b.id}`} key={b.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all group flex flex-col items-center text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-pink-500/5 rounded-bl-full -mr-10 -mt-10 group-hover:bg-blue-500/10 transition-colors"></div>
+              
+              <div className="w-16 h-16 bg-slate-50 group-hover:bg-blue-50 rounded-full flex items-center justify-center border border-slate-100 group-hover:border-blue-100 transition-colors mb-4 text-3xl font-black text-slate-300 group-hover:text-blue-500 uppercase tracking-tighter">
+                {b.name.substring(0, 2)}
+              </div>
+              
+              <div className="font-black text-lg text-slate-800 transition group-hover:text-blue-600 uppercase tracking-wide truncate w-full">{b.name}</div>
+              
+              <div className="mt-3 pt-3 border-t border-slate-100 w-full flex justify-between items-center text-slate-400 group-hover:text-blue-400 transition">
+                 <span className="text-[10px] font-mono bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 flex items-center gap-0.5">
+                   <Hash className="text-[8px]" /> {b.id.substring(b.id.length - 4)}
+                 </span>
+                 <ArrowRight weight="bold" className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {/* Add Modal */}
       {showAdd && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center sm:p-4" onClick={() => setShowAdd(false)}>
-          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-xl mb-4 text-slate-800 flex items-center gap-2">
-               <Tag weight="fill" className="text-blue-500" /> เพิ่มแบรนด์ฟิล์ม
-            </h3>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center sm:p-4 animate-in fade-in duration-200" onClick={() => setShowAdd(false)}>
+          <div className="bg-white w-full max-w-sm rounded-t-[32px] sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 bg-pink-50 rounded-xl flex items-center justify-center border border-pink-100 shadow-inner">
+                <Tag weight="fill" className="text-pink-500 text-xl" />
+              </div>
+              <div>
+                <h3 className="font-black text-xl text-slate-800 leading-tight">เพิ่มแบรนด์ฟิล์ม</h3>
+                <p className="text-xs text-slate-400 font-medium">บันทึกชื่อยี่ห้อฟิล์มใหม่เข้าระบบ</p>
+              </div>
+            </div>
             
-            <label className="block text-sm font-semibold mb-1">ชื่อแบรนด์ <span className="text-red-500">*</span></label>
-            <input value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Ex. 3M, V-Kool, Lamina..." className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none mb-3 focus:border-blue-500 font-bold" />
+            <div className="mt-6 mb-8">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">ชื่อแบรนด์ฟิล์ม (Brand Name) <span className="text-red-500">*</span></label>
+              <input 
+                value={newBrand} 
+                onChange={e => setNewBrand(e.target.value)} 
+                placeholder="เช่น V-KOOL, 3M, Hi-Kool" 
+                className="w-full border border-slate-200 rounded-xl px-4 py-3.5 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 font-black text-lg text-slate-800 uppercase transition" 
+                autoFocus
+              />
+            </div>
             
-            <label className="block text-sm font-semibold mb-1">หมายเหตุ / ข้อมูลเพิ่มเติม</label>
-            <textarea value={form.note} onChange={e=>setForm({...form, note:e.target.value})} placeholder="ระบุข้อมูลเพิ่มเติม..." className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none mb-4 focus:border-blue-500 min-h-[80px]" />
-            
-            <div className="flex gap-3 pt-2">
-              <button onClick={() => setShowAdd(false)} className="flex-1 font-bold py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200">ยกเลิก</button>
-              <button disabled={loading} onClick={submitAdd} className="flex-1 font-bold py-3 bg-blue-600 text-white rounded-xl shadow-md disabled:opacity-50 hover:bg-blue-700">บันทึกข้อมูล</button>
+            <div className="flex gap-3 pt-4 border-t border-slate-100">
+              <button onClick={() => setShowAdd(false)} className="flex-1 font-bold py-3.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition">ยกเลิก</button>
+              <button disabled={loading} onClick={addBrand} className="flex-1 font-bold py-3.5 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 disabled:opacity-50 transition flex items-center justify-center gap-2">
+                <Plus weight="bold" /> บันทึกแบรนด์
+              </button>
             </div>
           </div>
         </div>

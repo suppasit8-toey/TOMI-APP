@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, ClockCounterClockwise, PencilSimple, CalendarBlank, Printer } from '@phosphor-icons/react';
+import { Plus, ClockCounterClockwise, PencilSimple, CalendarBlank, Printer, Scroll, MagnifyingGlass, Funnel, Hash, ArrowSquareUpRight, ArrowSquareDownRight, ChartLineUp, Package, Tag, CurrencyDollar, WarningCircle } from '@phosphor-icons/react';
 import { supabase } from '@/lib/supabase';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/components/AuthProvider';
@@ -65,7 +65,7 @@ export default function StockPage() {
     const id = 'R' + new Date().getTime();
     const price = Number(form.price);
     const length = Number(form.length) || 30;
-    const cost = Math.ceil(price / length / 10) * 10; // ceilTo10 equivalent
+    const cost = Math.ceil(price / length / 10) * 10;
 
     const { error } = await supabase.from('stocks').insert({
       id,
@@ -85,7 +85,6 @@ export default function StockPage() {
       return Swal.fire('ผิดพลาด', error.message, 'error');
     }
 
-    // Add Expense to Accounts
     await supabase.from('accounts').insert({
       id: 'ACC' + id,
       transaction_date: form.date,
@@ -109,7 +108,6 @@ export default function StockPage() {
     setDetailModal({ open: true, info: s });
     setIsEditing(false);
     
-    // Fetch History
     const { data } = await supabase.from('project_transactions')
       .select('*, projects(name)')
       .eq('stock_id', s.id)
@@ -152,174 +150,306 @@ export default function StockPage() {
 
   const fmt = (num: number) => new Intl.NumberFormat('th-TH').format(num || 0);
 
+  // Calculate Stats
+  const totalStockValue = stocks.reduce((sum, s) => sum + (s.cost_per_meter * s.remaining_length), 0);
+  const lowStockCount = stocks.filter(s => s.remaining_length < 5 && s.remaining_length > 0).length;
+  const outOfStockCount = stocks.filter(s => s.remaining_length <= 0).length;
+
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
-      <div className="flex justify-between items-center mb-4 no-print">
-        <h2 className="text-xl font-bold text-slate-800">สต็อกฟิล์ม</h2>
-        <button onClick={() => setShowAdd(true)} className="bg-blue-600 text-white py-2 px-4 rounded-xl font-semibold shadow-lg shadow-blue-200 gap-2 flex items-center hover:-translate-y-0.5 transition hover:bg-blue-700">
-          <Plus weight="bold" /> เพิ่ม
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2 no-print">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shrink-0">
+            <Scroll weight="fill" className="text-blue-500 text-2xl" />
+          </div>
+          <div>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">สต็อกฟิล์ม</h2>
+            <p className="text-sm text-slate-400 mt-0.5 font-medium">จัดการรายการม้วนฟิล์มและการเบิกใช้</p>
+          </div>
+        </div>
+        <button onClick={() => setShowAdd(true)} className="bg-blue-600 text-white py-2.5 px-5 rounded-xl font-bold shadow-lg shadow-blue-200 gap-2 flex items-center hover:-translate-y-0.5 transition hover:bg-blue-700 whitespace-nowrap w-full md:w-auto justify-center">
+          <Plus weight="bold" className="text-lg" /> เพิ่มสต็อก
         </button>
       </div>
+
+      {/* Stats Board */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 no-print">
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-center gap-3">
+          <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shrink-0">
+            <Package weight="duotone" className="text-blue-500 text-xl" />
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ม้วนทั้งหมด</div>
+            <div className="text-lg font-black text-slate-800 leading-none mt-0.5">{stocks.length}</div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-center gap-3">
+          <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100 shrink-0">
+            <CurrencyDollar weight="duotone" className="text-emerald-500 text-xl" />
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">มูลค่าคงเหลือ</div>
+            <div className="text-lg font-black text-slate-800 leading-none mt-0.5 max-w-[100px] truncate" title={fmt(totalStockValue)}>฿{fmt(totalStockValue)}</div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-amber-100 flex items-center gap-3 relative overflow-hidden group">
+          <div className="absolute -right-2 -bottom-2 opacity-10 transform group-hover:scale-110 transition duration-500">
+            <WarningCircle weight="fill" className="text-amber-500 text-6xl" />
+          </div>
+          <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center border border-amber-200 shrink-0 z-10">
+            <WarningCircle weight="duotone" className="text-amber-500 text-xl" />
+          </div>
+          <div className="z-10">
+            <div className="text-[10px] font-bold text-amber-600/80 uppercase tracking-wider">ใกล้หมด (น้อยกว่า 5ม.)</div>
+            <div className="text-lg font-black text-amber-600 leading-none mt-0.5">{lowStockCount}</div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-red-100 flex items-center gap-3 relative overflow-hidden group">
+          <div className="absolute -right-2 -bottom-2 opacity-10 transform group-hover:scale-110 transition duration-500">
+            <ClockCounterClockwise weight="fill" className="text-red-500 text-6xl" />
+          </div>
+          <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center border border-red-200 shrink-0 z-10">
+            <ClockCounterClockwise weight="duotone" className="text-red-500 text-xl" />
+          </div>
+          <div className="z-10">
+            <div className="text-[10px] font-bold text-red-600/80 uppercase tracking-wider">หมดสต็อก</div>
+            <div className="text-lg font-black text-red-600 leading-none mt-0.5">{outOfStockCount}</div>
+          </div>
+        </div>
+      </div>
       
-      <div className="flex flex-col md:flex-row gap-3 mb-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm no-print">
-        <div className="flex-1 relative">
-          <input 
-            type="text" 
-            placeholder="ค้นหารหัสหรือยี่ห้อ..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700"
-          />
-          <svg className="w-5 h-5 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.4" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
+      {/* Search & Filter Bar */}
+      <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm no-print mb-4">
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex-1 relative">
+            <MagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
+            <input 
+              type="text" 
+              placeholder="ค้นหารหัส หรือ ยี่ห้อฟิล์ม..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all font-medium text-slate-700 text-sm"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition bg-slate-200 hover:bg-slate-300 rounded-full p-0.5">
+                <Plus className="rotate-45" weight="bold" />
+              </button>
+            )}
+          </div>
+          
+          <div className="flex gap-2 shrink-0 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+            <select 
+              value={selectedBrand} 
+              onChange={(e) => setSelectedBrand(e.target.value)}
+              className="min-w-[130px] px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all font-bold text-slate-700 text-sm appearance-none outline-none"
+              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2364748b\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px', paddingRight: '36px' }}
+            >
+              <option value="ทั้งหมด">📦 แบรนด์ (ทั้งหมด)</option>
+              {uniqueBrands.filter(b => b !== 'ทั้งหมด').map(b => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
+            
+            <select 
+              value={selectedType} 
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="min-w-[130px] px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all font-bold text-slate-700 text-sm appearance-none outline-none"
+              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2364748b\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px', paddingRight: '36px' }}
+            >
+              <option value="ทั้งหมด">🎞️ ประเภท (ทั้งหมด)</option>
+              {uniqueTypes.filter(t => t !== 'ทั้งหมด').map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+
+            <select 
+              value={sortBy} 
+              onChange={(e) => setSortBy(e.target.value)}
+              className="min-w-[140px] px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all font-bold text-slate-700 text-sm appearance-none outline-none"
+              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2364748b\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px', paddingRight: '36px' }}
+            >
+              <option value="newest">📅 เพิ่มล่าสุด - เก่าสุด</option>
+              <option value="oldest">📅 เก่าสุด - ล่าสุด</option>
+              <option value="most_remain">📏 เหลือมากสุด - น้อยสุด</option>
+              <option value="least_remain">📏 เหลือน้อยสุด - มากสุด</option>
+            </select>
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex gap-2">
-          <select 
-            value={selectedBrand} 
-            onChange={(e) => setSelectedBrand(e.target.value)}
-            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold text-slate-700 text-xs sm:text-sm appearance-none"
-            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px', paddingRight: '40px' }}
-          >
-            <option value="ทั้งหมด">📦 แบรนด์: ทั้งหมด</option>
-            {uniqueBrands.filter(b => b !== 'ทั้งหมด').map(b => (
-              <option key={b} value={b}>{b}</option>
-            ))}
-          </select>
-          
-          <select 
-            value={selectedType} 
-            onChange={(e) => setSelectedType(e.target.value)}
-            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold text-slate-700 text-xs sm:text-sm appearance-none"
-            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px', paddingRight: '40px' }}
-          >
-            <option value="ทั้งหมด">🎞️ ประเภท: ทั้งหมด</option>
-            {uniqueTypes.filter(t => t !== 'ทั้งหมด').map(t => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-
-          <select 
-            value={sortBy} 
-            onChange={(e) => setSortBy(e.target.value)}
-            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold text-slate-700 text-xs sm:text-sm appearance-none sm:col-span-2 lg:col-span-1"
-            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px', paddingRight: '40px' }}
-          >
-            <option value="newest">📅 ใหม่สุด - เก่าสุด</option>
-            <option value="oldest">📅 เก่าสุด - ใหม่สุด</option>
-            <option value="most_remain">📏 เหลือเยอะสุด</option>
-            <option value="least_remain">📏 เหลือน้อยสุด</option>
-          </select>
+        {/* Status Pills */}
+        <div className="flex gap-2 items-center mt-3 pt-3 border-t border-slate-100 overflow-x-auto no-scrollbar">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mr-2 flex items-center gap-1.5 whitespace-nowrap"><Funnel weight="fill"/> สถานะ:</span>
+          {['ทั้งหมด', 'มีของ', 'หมด'].map(f => (
+            <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 rounded-full text-xs font-bold transition shadow-sm border whitespace-nowrap ${filter === f ? (f === 'ทั้งหมด' ? 'bg-slate-800 text-white border-slate-800' : f === 'มีของ' ? 'bg-green-600 text-white border-green-600' : 'bg-red-600 text-white border-red-600') : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}>
+              {f}
+            </button>
+          ))}
+          {(searchQuery || selectedBrand !== 'ทั้งหมด' || selectedType !== 'ทั้งหมด' || filter !== 'ทั้งหมด' || sortBy !== 'newest') && (
+             <button 
+               onClick={() => { setSearchQuery(''); setSelectedBrand('ทั้งหมด'); setSelectedType('ทั้งหมด'); setFilter('ทั้งหมด'); setSortBy('newest'); }}
+               className="text-[11px] font-bold text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full ml-auto transition whitespace-nowrap"
+             >
+               ล้างตัวกรองทั้งหมด
+             </button>
+          )}
         </div>
       </div>
 
-      <div className="flex gap-2 mb-3 items-center overflow-x-auto pb-1 no-scrollbar no-print">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mr-2 whitespace-nowrap">สถานะ:</span>
-        {['ทั้งหมด', 'มีของ', 'หมด'].map(f => (
-          <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-full text-xs font-bold transition shadow-sm border whitespace-nowrap ${filter === f ? (f === 'ทั้งหมด' ? 'bg-slate-800 text-white border-slate-800' : f === 'มีของ' ? 'bg-green-600 text-white border-green-600' : 'bg-red-600 text-white border-red-600') : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}>
-            {f}
-          </button>
-        ))}
-        {(searchQuery || selectedBrand !== 'ทั้งหมด' || selectedType !== 'ทั้งหมด' || filter !== 'ทั้งหมด' || sortBy !== 'newest') && (
-           <button 
-             onClick={() => { setSearchQuery(''); setSelectedBrand('ทั้งหมด'); setSelectedType('ทั้งหมด'); setFilter('ทั้งหมด'); setSortBy('newest'); }}
-             className="text-[10px] font-bold text-red-500 hover:underline ml-2"
-           >
-             ล้างตัวกรอง
-           </button>
-        )}
-      </div>
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map(s => (
-          <div key={s.id} onClick={() => openDetail(s)} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 cursor-pointer hover:border-blue-400 hover:shadow-md transition relative overflow-hidden group">
-            <div className={`absolute top-0 right-0 px-3 py-1.5 text-[10px] font-bold rounded-bl-2xl shadow-sm tracking-wider ${s.status === 'หมด' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
-              {s.status}
-            </div>
+      {loading ? (
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
+          <Scroll weight="thin" className="text-7xl text-slate-200 mx-auto mb-4" />
+          <p className="text-slate-400 font-bold text-lg">ไม่พบข้อมูลสต็อก</p>
+          <p className="text-slate-300 text-sm mt-1">ลองเปลี่ยนคำค้นหา หรือ เพิ่มตัวใหม่</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filtered.map(s => {
+            const isLowStock = s.remaining_length < 5 && s.remaining_length > 0;
+            const isOutOfStock = s.status === 'หมด' || s.remaining_length <= 0;
+            const ratio = Math.max(0, s.remaining_length) / s.initial_length * 100;
             
-            <div className="flex flex-col mb-3">
-              <div className="font-bold text-lg text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition">{s.brand} {s.film_code}</div>
-              <div className="text-[11px] text-blue-600 font-bold bg-blue-50 inline-block px-2 py-0.5 rounded-full mb-1 w-fit border border-blue-100">{s.film_type}</div>
-              <div className="mt-1 flex flex-col pt-1">
-                <span className="font-barcode text-slate-400 tracking-[0.2em] text-4xl opacity-50 leading-none">{s.id}</span>
-              </div>
-            </div>
+            return (
+              <div key={s.id} onClick={() => openDetail(s)} className={`bg-white p-5 rounded-2xl shadow-sm border cursor-pointer transition relative overflow-hidden group hover:-translate-y-1 hover:shadow-md ${isOutOfStock ? 'border-red-200 hover:border-red-400' : isLowStock ? 'border-amber-200 hover:border-amber-400 bg-amber-50/10' : 'border-slate-200 hover:border-blue-400'}`}>
+                
+                {/* Out of Stock / Low Stock Banner */}
+                {isOutOfStock ? (
+                  <div className="absolute top-0 right-0 px-3 py-1.5 text-[10px] font-bold rounded-bl-xl shadow-sm tracking-wider bg-red-500 text-white z-10 flex items-center gap-1">
+                    <WarningCircle weight="bold" /> หมด
+                  </div>
+                ) : isLowStock ? (
+                  <div className="absolute top-0 right-0 px-3 py-1.5 text-[10px] font-bold rounded-bl-xl shadow-sm tracking-wider bg-amber-500 text-white z-10 flex items-center gap-1">
+                    <WarningCircle weight="bold" /> ใกล้หมด
+                  </div>
+                ) : (
+                  <div className="absolute top-0 right-0 w-2 h-2 rounded-bl-xl bg-green-500"></div>
+                )}
+                
+                <div className="flex flex-col mb-3">
+                  <div className="font-black text-xl text-slate-800 leading-tight mb-1.5 group-hover:text-blue-600 transition flex items-start justify-between pr-4">
+                    <span>
+                      <span className="text-slate-400 font-medium text-sm mr-1">{s.brand}</span> 
+                      {s.film_code}
+                    </span>
+                  </div>
+                  <div className="flex gap-1.5 flex-wrap">
+                    <div className="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 flex items-center gap-1 whitespace-nowrap"><Tag weight="fill"/> {s.film_type || 'ไม่มีระบุ'}</div>
+                    <div className="text-[10px] text-slate-500 font-bold bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 flex items-center gap-1 whitespace-nowrap">หน้า {s.width}cm</div>
+                  </div>
+                  <div className="mt-2.5 flex flex-col pt-2 border-t border-slate-100">
+                    <span className="font-barcode text-slate-400 tracking-[0.2em] text-4xl opacity-40 leading-none">{s.id}</span>
+                    <span className="text-[9px] font-mono font-bold text-slate-300 tracking-wider -mt-1 ml-1">{s.id}</span>
+                  </div>
+                </div>
 
-            <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition">
-               <button 
-                 onClick={(e) => { e.stopPropagation(); handlePrint(s); }}
-                 className="bg-white border border-slate-200 p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:border-blue-400 shadow-sm transition"
-                 title="พิมพ์ฉลาก"
-               >
-                 <Printer weight="bold" />
-               </button>
-            </div>
-            
-            <div className="flex justify-between items-end border-t border-slate-100 pt-3 mt-1">
-              <div>
-                <div className="text-[11px] text-gray-400 font-medium">คงเหลือ / เริ่มต้น</div>
-                <div className={`text-[17px] font-bold ${s.remaining_length < 5 ? 'text-red-600' : 'text-green-600'}`}>
-                  {s.remaining_length} <span className="text-gray-400 text-xs font-medium">/ {s.initial_length} ม.</span>
+                <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition translate-y-2 group-hover:translate-y-0">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handlePrint(s); }}
+                    className="bg-white border border-slate-200 p-2.5 rounded-xl text-slate-500 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50 shadow-sm transition"
+                    title="พิมพ์ฉลาก"
+                  >
+                    <Printer weight="fill" className="text-lg" />
+                  </button>
+                </div>
+                
+                <div className="mt-2 text-right">
+                  <div className="text-xl font-black text-slate-700 leading-none">฿{fmt(s.price)}</div>
+                  <div className="text-[10px] text-slate-400 font-bold mt-1 uppercase">ทุน ฿{fmt(s.cost_per_meter)}/ม.</div>
+                </div>
+                
+                {/* Progress Bar styled */}
+                <div className="mt-4 pt-3 border-t border-slate-100/60">
+                  <div className="flex justify-between items-end mb-1.5">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">คงเหลือ</span>
+                    <div className={`text-lg font-black leading-none ${isOutOfStock ? 'text-red-500' : isLowStock ? 'text-amber-500' : 'text-green-600'}`}>
+                      {s.remaining_length} <span className="text-slate-400 text-xs font-medium">/ {s.initial_length} ม.</span>
+                    </div>
+                  </div>
+                  <div className="bg-slate-100 rounded-full w-full overflow-hidden h-2 shadow-inner">
+                    <div className={`h-full rounded-full transition-all duration-1000 ${isOutOfStock ? 'bg-red-500' : isLowStock ? 'bg-amber-500' : 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]'}`} style={{width: `${ratio}%`}}></div>
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-base font-bold text-blue-600">{fmt(s.price)} บ.</div>
-                <div className="text-[11px] text-gray-400 font-medium bg-slate-50 px-1.5 py-0.5 rounded mt-0.5">ทุน {fmt(s.cost_per_meter)}/ม.</div>
-              </div>
-            </div>
-            
-            <div className="bg-slate-100 rounded-full w-full overflow-hidden mt-3 h-2 block">
-              <div className={`h-full rounded-full transition-all duration-500 ${s.remaining_length < 5 ? 'bg-red-500' : 'bg-green-500'}`} style={{width: `${Math.max(0, s.remaining_length) / s.initial_length * 100}%`}}></div>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Add Stock Modal */}
       {showAdd && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4" onClick={() => setShowAdd(false)}>
-          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-xl mb-4 text-slate-800">เพิ่มสต็อกฟิล์ม</h3>
-            <label className="block text-sm font-semibold mb-1">วันที่</label>
-            <input type="date" value={form.date} onChange={e=>setForm({...form, date:e.target.value})} className="w-full border rounded-xl px-4 py-2.5 outline-none mb-3 bg-slate-50" />
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center sm:p-4 animate-in fade-in duration-200" onClick={() => setShowAdd(false)}>
+          <div className="bg-white w-full max-w-sm rounded-t-[32px] sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
+                <Scroll weight="fill" className="text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-slate-800">เพิ่มสต็อกม้วนใหม่</h3>
+                <p className="text-xs text-slate-400 font-medium">บันทึกฟิล์มม้วนใหม่เข้าระบบ</p>
+              </div>
+            </div>
             
-            <label className="block text-sm font-semibold mb-1">ยี่ห้อ (Brand)</label>
-            <select value={form.brand} onChange={e=>setForm({...form, brand:e.target.value})} className="w-full border rounded-xl px-4 py-2.5 outline-none mb-3 bg-white font-bold text-slate-700">
-              <option value="">- เลือกแบรนด์/ซัพพลายเออร์ -</option>
-              {brands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
-            </select>
-            
-            <label className="block text-sm font-semibold mb-1">รหัสฟิล์ม</label>
-            <input value={form.code} onChange={e=>setForm({...form, code:e.target.value})} placeholder="Ex. R10" className="w-full border rounded-xl px-4 py-2.5 outline-none mb-3" />
-            
-            <label className="block text-sm font-semibold mb-1">ประเภท</label>
-            <input value={form.type} onChange={e=>setForm({...form, type:e.target.value})} placeholder="Ex. Ceramic" className="w-full border rounded-xl px-4 py-2.5 outline-none mb-3" />
-            
-            <label className="block text-sm font-semibold mb-1">ราคาต้นทุน (ยกม้วน)</label>
-            <input type="number" value={form.price} onChange={e=>setForm({...form, price:e.target.value})} placeholder="บาท" className="w-full border rounded-xl px-4 py-2.5 outline-none font-bold text-lg text-blue-600 mb-3" />
-            
-            <div className="grid grid-cols-2 gap-3 mb-1">
-               <div>
-                  <label className="block text-sm font-semibold mb-1">หน้ากว้าง (ซม.)</label>
-                  <input type="number" value={form.width} onChange={e=>setForm({...form, width:e.target.value})} placeholder="152" className="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 font-bold" />
-               </div>
-               <div>
-                  <label className="block text-sm font-semibold mb-1">ความยาว (เมตร)</label>
-                  <input type="number" value={form.length} onChange={e=>setForm({...form, length:e.target.value})} placeholder="30" className="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-blue-500 font-bold" />
-               </div>
+            <div className="space-y-3.5">
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">วันที่นำเข้า</label>
+                <input type="date" value={form.date} onChange={e=>setForm({...form, date:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none bg-slate-50 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition font-medium" />
+              </div>
+              
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">ยี่ห้อ (Brand) <span className="text-red-500">*</span></label>
+                <select value={form.brand} onChange={e=>setForm({...form, brand:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none bg-white font-bold text-slate-700 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition" required>
+                  <option value="">- เลือกแบรนด์/ซัพพลายเออร์ -</option>
+                  {brands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                </select>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">รหัสฟิล์ม <span className="text-red-500">*</span></label>
+                  <input value={form.code} onChange={e=>setForm({...form, code:e.target.value})} placeholder="เช่น R10" className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition font-bold" required />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">ประเภท</label>
+                  <input value={form.type} onChange={e=>setForm({...form, type:e.target.value})} placeholder="เช่น Ceramic" className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition" />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                 <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">หน้ากว้าง (ซม.)</label>
+                    <input type="number" value={form.width} onChange={e=>setForm({...form, width:e.target.value})} placeholder="152" className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition font-bold" />
+                 </div>
+                 <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">ความยาว (เมตร)</label>
+                    <input type="number" value={form.length} onChange={e=>setForm({...form, length:e.target.value})} placeholder="30" className="w-full border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition font-bold" />
+                 </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">ราคาต้นทุน (ยกม้วน) <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span className="text-slate-400 font-bold">฿</span>
+                  </div>
+                  <input type="number" value={form.price} onChange={e=>setForm({...form, price:e.target.value})} placeholder="0" className="w-full border border-slate-200 rounded-xl pl-9 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition font-black text-xl text-slate-800" required />
+                </div>
+                {form.price && form.length && (
+                  <p className="text-[10px] text-blue-600 font-bold mt-1.5 bg-blue-50 w-fit px-2 py-0.5 rounded border border-blue-100">
+                    เฉลี่ยตารางเมตรละ ≈ ฿{Math.ceil(Number(form.price) / Number(form.length) / 10) * 10}/ม.
+                  </p>
+                )}
+              </div>
             </div>
 
-            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
-              <button onClick={() => setShowAdd(false)} className="flex-1 font-semibold py-3 bg-slate-100 text-slate-600 rounded-xl">ยกเลิก</button>
-              <button disabled={loading} onClick={submitAdd} className="flex-1 font-semibold py-3 bg-blue-600 text-white rounded-xl shadow-md disabled:opacity-50">บันทึก</button>
+            <div className="flex gap-3 mt-8 pt-4 border-t border-slate-100">
+              <button onClick={() => setShowAdd(false)} className="flex-1 font-bold py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition">ยกเลิก</button>
+              <button disabled={loading} onClick={submitAdd} className="flex-1 font-bold py-3 bg-blue-600 text-white rounded-xl shadow-md shadow-blue-200 hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2">
+                <Plus weight="bold" /> นำเข้าสต็อก
+              </button>
             </div>
           </div>
         </div>
@@ -327,74 +457,87 @@ export default function StockPage() {
 
       {/* Stock Detail Modal */}
       {detailModal.open && detailModal.info && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center sm:p-4" onClick={() => setDetailModal({open: false})}>
-          <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-start mb-4 border-b pb-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center sm:p-4 animate-in fade-in duration-200" onClick={() => setDetailModal({open: false})}>
+          <div className="bg-white w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            
+            <div className="flex justify-between items-start mb-6 border-b border-slate-100 pb-5 shrink-0">
               <div>
-                <h3 className="font-bold text-xl text-slate-800">{detailModal.info.brand} {detailModal.info.film_code}</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-xs text-gray-500 font-mono bg-gray-100 inline-block px-2 py-0.5 rounded-full font-bold">ID: {detailModal.info.id}</p>
-                  <button onClick={() => handlePrint(detailModal.info)} className="flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 transition">
+                <h3 className="font-black text-2xl text-slate-800 tracking-tight leading-none mb-1">
+                  <span className="text-slate-400 font-medium text-lg mr-1">{detailModal.info.brand}</span>
+                  {detailModal.info.film_code}
+                </h3>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-[10px] text-slate-500 font-mono bg-slate-100 inline-block px-2 py-0.5 rounded-md font-bold border border-slate-200 shadow-inner">ID: {detailModal.info.id}</p>
+                  <button onClick={() => handlePrint(detailModal.info)} className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 hover:bg-blue-100 transition">
                     <Printer weight="fill" /> พิมพ์ฉลาก
                   </button>
                 </div>
               </div>
               <div className="text-right">
                 {!isEditing ? (
-                  <>
-                    <div className="font-black text-blue-600 text-3xl flex items-center justify-end gap-2 leading-none">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-2.5 px-4 flex flex-col items-end group shadow-inner">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">คงเหลือ</div>
+                    <div className={`font-black text-3xl flex items-center justify-end gap-1.5 leading-none ${detailModal.info.remaining_length <= 0 ? 'text-red-500' : detailModal.info.remaining_length < 5 ? 'text-amber-500' : 'text-blue-600'}`}>
                       {detailModal.info.remaining_length} <span className="text-sm font-medium text-slate-400 mt-2">ม.</span>
-                      <button onClick={() => { setEditQty(detailModal.info.remaining_length); setIsEditing(true); }} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition ml-2 -mt-1">
+                      <button onClick={() => { setEditQty(detailModal.info.remaining_length); setIsEditing(true); }} className="w-6 h-6 rounded-md bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-300 shadow-sm transition ml-1 opacity-50 group-hover:opacity-100">
                         <PencilSimple weight="bold" />
                       </button>
                     </div>
-                    <div className="text-[11px] font-medium text-slate-400 uppercase mt-1">คงเหลือ</div>
-                  </>
+                  </div>
                 ) : (
-                  <div className="flex flex-col items-end gap-2">
-                    <input type="number" value={editQty} onChange={e=>setEditQty(e.target.value)} className="w-24 text-right p-2 text-xl font-bold border-2 border-blue-500 rounded-xl bg-blue-50 text-blue-700 outline-none" autoFocus />
-                    <div className="flex gap-1.5 mt-1">
-                      <button onClick={saveEdit} disabled={loading} className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700">บันทึก</button>
-                      <button onClick={() => setIsEditing(false)} className="bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-300">ยกเลิก</button>
+                  <div className="flex flex-col items-end gap-2 bg-blue-50 p-3 rounded-2xl border border-blue-200">
+                    <div className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-0.5 w-full text-right">แก้ไขยอดคงเหลือ</div>
+                    <div className="flex items-center gap-2 w-full">
+                      <input type="number" value={editQty} onChange={e=>setEditQty(e.target.value)} className="w-20 text-right p-1.5 text-xl font-bold border-2 border-blue-500 rounded-lg bg-white text-blue-700 outline-none focus:ring-2 focus:ring-blue-200" autoFocus />
+                      <span className="text-sm font-bold text-blue-400">ม.</span>
+                    </div>
+                    <div className="flex gap-1.5 mt-1 w-full justify-end">
+                      <button onClick={() => setIsEditing(false)} className="bg-white text-slate-500 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-100 flex-1">ยกเลิก</button>
+                      <button onClick={saveEdit} disabled={loading} className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md hover:bg-blue-700 flex-1">อัปเดต</button>
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
-            <h4 className="font-bold text-sm text-slate-700 mb-3 flex items-center gap-2">
-               ประวัติการตัดสต็อก
+            <h4 className="font-bold text-sm text-slate-700 mb-3 flex items-center gap-2 shrink-0">
+               <Hash weight="fill" className="text-slate-400" /> ประวัติการตัดสต็อกนำไปใช้
             </h4>
             
-            {history.length > 0 ? (
-              <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                {history.map((h, i) => (
-                  <div key={i} className="bg-slate-50 p-3 rounded-xl border border-slate-100 flex justify-between items-center transition hover:bg-white hover:shadow-sm">
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 pb-4">
+              {history.length > 0 ? (
+                history.map((h, i) => (
+                  <div key={i} className="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm flex justify-between items-center transition hover:border-blue-200 group">
                     <div>
-                      <div className="font-bold text-slate-800 text-sm mb-1">{h.projectName}</div>
+                      <div className="font-bold text-slate-800 text-sm mb-1 group-hover:text-blue-600 transition">{h.projectName}</div>
                       <div className="text-[11px] text-gray-500 flex items-center gap-1.5 font-medium">
-                        <CalendarBlank weight="fill" className="text-slate-400" /> {h.date} • {h.user}
+                        <CalendarBlank weight="fill" className="text-slate-400" /> {new Date(h.date).toLocaleDateString('th-TH', {day:'numeric', month:'short', year:'numeric'})}
+                        <span className="text-slate-300">•</span> 
+                        <PencilSimple weight="fill" className="text-slate-400" /> {h.user}
                       </div>
                     </div>
-                    <div className="font-bold text-red-500 bg-red-50 px-2.5 py-1 rounded-lg text-sm">- {h.meter} ม.</div>
+                    <div className="font-black text-red-500 bg-red-50 border border-red-100 px-3 py-1.5 rounded-lg text-sm shadow-inner group-hover:bg-red-500 group-hover:text-white transition">
+                      -{h.meter} <span className="text-[10px] font-medium opacity-80">ม.</span>
+                    </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-slate-400 py-10 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center">
-                <ClockCounterClockwise weight="duotone" className="text-4xl mb-2 text-slate-300" />
-                <span className="font-medium text-sm">ยังไม่มีประวัติการใช้งาน</span>
-              </div>
-            )}
+                ))
+              ) : (
+                <div className="text-center text-slate-400 py-12 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center">
+                  <ClockCounterClockwise weight="duotone" className="text-4xl mb-3 text-slate-300" />
+                  <span className="font-bold text-sm text-slate-500">ยังไม่มีประวัติการใช้งาน</span>
+                  <span className="text-xs mt-1">ฟิล์มม้วนใหม่ ยังไม่ถูกเบิก</span>
+                </div>
+              )}
+            </div>
             
-            <div className="mt-6 pt-4 border-t">
+            <div className="mt-4 pt-4 border-t border-slate-100 shrink-0">
               <button onClick={() => setDetailModal({open: false})} className="font-bold py-3 bg-slate-100 text-slate-600 w-full rounded-xl hover:bg-slate-200 transition">ปิดหน้าต่าง</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* PRINTABLE LABEL TEMPLATE */}
+      {/* PRINTABLE LABEL TEMPLATE (Keep exactly as is) */}
       <div id="print-label" className="stock-label-area" style={{ display: 'none' }}>
          <style>{`
            @media print {

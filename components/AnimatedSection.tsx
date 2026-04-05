@@ -10,6 +10,7 @@ interface Props {
   threshold?: number;
   /** Wrap children in a stagger container */
   stagger?: boolean;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -23,6 +24,7 @@ export default function AnimatedSection({
   delay = 0,
   threshold = 0.15,
   stagger = false,
+  style = {},
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -52,6 +54,7 @@ export default function AnimatedSection({
     <div
       ref={ref}
       className={`${animation} ${stagger ? 'stagger-children' : ''} ${className}`}
+      style={style}
     >
       {children}
     </div>
