@@ -12,11 +12,10 @@ export const metadata: Metadata = {
   openGraph: { title: 'บทความ & ความรู้ — TOMI FILM', type: 'website' },
 };
 
+import { blogPosts as fallbackPosts } from '@/lib/data/blog';
+
 export default async function BlogPage() {
-  let posts: {
-    id: string; title: string; slug: string; excerpt: string;
-    cover_image_url: string; category: string; created_at: string; tags: string[];
-  }[] = [];
+  let posts: any[] = [];
 
   try {
     const { data } = await supabase
@@ -24,10 +23,16 @@ export default async function BlogPage() {
       .select('id,title,slug,excerpt,cover_image_url,category,created_at,tags')
       .eq('published', true)
       .order('created_at', { ascending: false });
-    if (data) posts = data;
-  } catch {}
+    if (data && data.length > 0) {
+      posts = data;
+    } else {
+      posts = fallbackPosts;
+    }
+  } catch {
+    posts = fallbackPosts;
+  }
 
-  const categories = ['ทั้งหมด', ...Array.from(new Set(posts.map(p => p.category)))];
+  const categories = ['ทั้งหมด', ...Array.from(new Set(posts.map((p: any) => p.category)))];
 
   return (
     <div className="min-h-screen bg-white font-sans overflow-x-hidden">
@@ -89,7 +94,7 @@ export default async function BlogPage() {
                     {post.excerpt && <p className="text-sm text-black/35 font-light line-clamp-2 leading-relaxed">{post.excerpt}</p>}
                     {post.tags?.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-3">
-                        {post.tags.slice(0,3).map(tag => (
+                        {post.tags.slice(0,3).map((tag: string) => (
                           <span key={tag} className="text-[10px] text-black/30 border border-black/10 px-2 py-0.5 font-light flex items-center gap-1">
                             <Tag weight="regular" className="text-xs" />{tag}
                           </span>

@@ -30,14 +30,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+import { blogPosts as fallbackPosts } from '@/lib/data/blog';
+
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
 
-  let post: {
-    id: string; title: string; slug: string; excerpt: string; content: string;
-    cover_image_url: string; category: string; created_at: string; updated_at: string;
-    tags: string[]; meta_title: string; meta_description: string; published: boolean;
-  } | null = null;
+  let post: any = null;
 
   try {
     const { data } = await supabase
@@ -46,8 +44,14 @@ export default async function BlogPostPage({ params }: Props) {
       .eq('slug', slug)
       .eq('published', true)
       .single();
-    post = data;
-  } catch {}
+    if (data) {
+      post = data;
+    } else {
+      post = fallbackPosts.find(p => p.slug === slug);
+    }
+  } catch {
+    post = fallbackPosts.find(p => p.slug === slug);
+  }
 
   if (!post) notFound();
 
@@ -101,7 +105,7 @@ export default async function BlogPostPage({ params }: Props) {
           {post.excerpt && <p className="mt-4 text-white/45 text-base font-light leading-relaxed max-w-2xl">{post.excerpt}</p>}
           {post.tags?.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-6">
-              {post.tags.map(tag => (
+              {post.tags.map((tag: string) => (
                 <span key={tag} className="text-[11px] text-white/30 border border-white/10 px-2.5 py-1 font-light flex items-center gap-1">
                   <Tag weight="regular" className="text-xs" />{tag}
                 </span>
@@ -124,7 +128,16 @@ export default async function BlogPostPage({ params }: Props) {
           prose-blockquote:border-l-4 prose-blockquote:border-black/20 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-black/40
           prose-img:rounded-sm prose-img:shadow-md
           prose-hr:border-black/10"
-          dangerouslySetInnerHTML={{ __html: post.content.split('\n').map(line => `<p>${line}</p>`).join('') }}
+          dangerouslySetInnerHTML={{ __html: post.content
+            .split('\n')
+            .map((line: string) => {
+              if (line.startsWith('### ')) return `<h3>${line.replace('### ', '')}</h3>`;
+              if (line.startsWith('**') && line.endsWith('**')) return `<strong>${line.replace(/\*\*/g, '')}</strong>`;
+              if (line.trim() === '') return '<br />';
+              return `<p>${line}</p>`;
+            })
+            .join('')
+          }}
         />
       </article>
 
