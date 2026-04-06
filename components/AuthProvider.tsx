@@ -48,11 +48,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const isPublicRoute = pathname === '/';
+  const protectedRoutes = [
+    '/dashboard', '/projects', '/stock', '/accounts', 
+    '/suppliers', '/brands', '/calculator', '/quotations', 
+    '/website-manager', '/report'
+  ];
+  
+  const isAuthRequired = protectedRoutes.some(route => pathname.startsWith(route));
 
   return (
     <AuthContext.Provider value={{ user, setUser, logout }}>
-      {user || isPublicRoute ? children : <LoginScreen />}
+      {user || !isAuthRequired ? children : <LoginScreen />}
     </AuthContext.Provider>
   );
 }
