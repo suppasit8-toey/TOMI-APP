@@ -154,17 +154,19 @@ export default async function LandingPage() {
                {/* Vertical Column */}
                <div className="lg:col-span-5 flex flex-col gap-8 h-full">
                   <AnimatedSection animation="reveal-right" className="flex-1">
-                     <div className="group h-full relative rounded-[48px] overflow-hidden bg-white p-12 flex flex-col justify-between">
-                        <div className="flex justify-between items-start">
-                           <div className="w-16 h-16 bg-slate-950 rounded-2xl flex items-center justify-center">
+                     <div className="group h-full relative rounded-[48px] overflow-hidden bg-slate-900 border border-white/5 p-12 flex flex-col justify-between">
+                        <img src={content.service2_image_url} alt="Corporate" className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-110 transition-transform duration-[2s]" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
+                        <div className="relative z-10 flex justify-between items-start">
+                           <div className="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/20">
                               <Buildings weight="fill" className="text-3xl text-white" />
                            </div>
-                           <ArrowUpRight weight="bold" className="text-slate-900 text-3xl opacity-20 group-hover:opacity-100 transition-opacity" />
+                           <ArrowUpRight weight="bold" className="text-white text-3xl opacity-20 group-hover:opacity-100 transition-opacity" />
                         </div>
-                        <div>
-                           <span className="text-[10px] font-black tracking-[0.4em] uppercase text-slate-400 mb-4 block">02 / Enterprise</span>
-                           <h3 className="text-3xl font-black text-slate-950 uppercase mb-4">{content.service2_title}</h3>
-                           <p className="text-slate-500 text-sm font-light leading-relaxed">{content.service2_desc}</p>
+                        <div className="relative z-10">
+                           <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-400 mb-4 block">02 / Enterprise</span>
+                           <h3 className="text-3xl font-black text-white uppercase mb-4">{content.service2_title}</h3>
+                           <p className="text-slate-400 text-sm font-light leading-relaxed">{content.service2_desc}</p>
                         </div>
                      </div>
                   </AnimatedSection>
@@ -250,10 +252,47 @@ export default async function LandingPage() {
       </section>
 
       {/* ═══ 3.5 PROCESS SECTION ═══ */}
-      <section id="process" className="py-20 bg-slate-950">
-         <div className="container mx-auto px-6 text-center">
-            <p className="text-blue-500 text-[10px] font-black tracking-[0.5em] uppercase mb-4">The Journey</p>
-            <h2 className="text-4xl font-black uppercase text-white">Our Workflow</h2>
+      <section id="process" className="py-40 bg-slate-950 relative overflow-hidden">
+         <div className="container mx-auto px-6 lg:px-20 relative z-10">
+            <div className="text-center mb-20 lg:mb-32">
+               <p className="text-blue-500 text-[11px] font-black tracking-[0.5em] uppercase mb-8">Masterclass Pipeline</p>
+               <h2 className="text-[56px] lg:text-[80px] font-black leading-[0.9] uppercase tracking-tighter text-white">
+                 The Path To<br /><span className="text-white/20">Perfection.</span>
+               </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+               {[
+                 { 
+                   step: '01', title: 'Consultation', desc: 'ทีมผู้เชี่ยวชาญศึกษาโจทย์และความต้องการ เพื่อแนะนำฟิล์มที่เหมาะสมที่สุด',
+                   img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1000' 
+                 },
+                 { 
+                   step: '02', title: 'Precision Measure', desc: 'วัดขนาดกระจกด้วยความละเอียดสูงสุด เพื่อการตัดฟิล์มที่พอดีไร้ที่ติ',
+                   img: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=1000' 
+                 },
+                 { 
+                   step: '03', title: 'Professional Install', desc: 'ติดตั้งโดยทีมช่างชำนาญการในห้องควบคุมฝุ่น มาตรฐานสากล',
+                   img: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=1000' 
+                 },
+                 { 
+                   step: '04', title: 'Quality Audit', desc: 'ตรวจสอบความเรียบร้อย 100% ก่อนส่งมอบงานคุณภาพระดับพรีเมียม',
+                   img: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=1000' 
+                 },
+               ].map((item, i) => (
+                 <AnimatedSection key={i} animation="reveal" style={{ transitionDelay: `${i * 150}ms` }} className="h-full">
+                    <div className="group relative h-full aspect-[3/4] rounded-[40px] overflow-hidden border border-white/5 bg-slate-900">
+                       <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-110 transition-transform duration-[1.5s]" />
+                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                       <div className="absolute inset-0 p-10 flex flex-col justify-end">
+                          <span className="text-4xl font-black text-blue-500 mb-4 block opacity-40 group-hover:opacity-100 transition-opacity italic">{item.step}</span>
+                          <h4 className="text-xl font-black text-white uppercase mb-4 tracking-tighter">{item.title}</h4>
+                          <p className="text-slate-400 text-xs font-light leading-relaxed">{item.desc}</p>
+                       </div>
+                    </div>
+                 </AnimatedSection>
+               ))}
+            </div>
          </div>
       </section>
 
@@ -286,10 +325,47 @@ export default async function LandingPage() {
       </section>
 
       {/* ═══ 4.5 ABOUT SECTION ═══ */}
-      <section id="about" className="py-20 bg-white">
-         <div className="container mx-auto px-6 text-center">
-            <h2 className="text-4xl font-black uppercase text-slate-950">About TOMI</h2>
-            <p className="text-slate-500 mt-4 max-w-xl mx-auto font-light">{content.about_text}</p>
+      <section id="about" className="py-40 bg-white text-slate-900 border-t border-slate-100 overflow-hidden">
+         <div className="container mx-auto px-6 lg:px-20">
+            <div className="flex flex-col lg:flex-row items-center gap-20">
+               <div className="lg:w-1/2 relative">
+                  <div className="aspect-[4/5] relative rounded-[60px] overflow-hidden shadow-2xl">
+                     <img src={content.about_image_url} alt="About TOMI FILM" className="w-full h-full object-cover" />
+                  </div>
+                  {/* Floating Certificate Card */}
+                  <div className="absolute -bottom-10 -right-10 bg-blue-600 p-8 rounded-[40px] text-white shadow-2xl max-w-xs animate-float">
+                     <Medal weight="duotone" className="text-4xl mb-4" />
+                     <p className="text-sm font-black tracking-widest uppercase mb-2">Certified Excellence</p>
+                     <p className="text-xs text-white/60 leading-relaxed font-light">เราคัดสรรฟิล์มเกรดพรีเมียมพร้อมการรับรองมาตรฐานสากล เพื่อความมั่นใจในทุกการติดตั้ง</p>
+                  </div>
+               </div>
+               <div className="lg:w-1/2">
+                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">Established Integrity</p>
+                  <h2 className="text-[56px] lg:text-[72px] font-black leading-[0.95] tracking-tighter uppercase mb-12">
+                    A Legacy of<br /><span className="text-slate-300">Precision.</span>
+                  </h2>
+                  <div className="space-y-8 max-w-xl">
+                     <p className="text-slate-500 text-lg font-light leading-relaxed">
+                        {content.about_text}
+                     </p>
+                     <p className="text-slate-500 text-lg font-light leading-relaxed">
+                        ด้วยวิสัยทัศน์ที่มุ่งเน้นความเป็นเลิศ เราจึงเลือกใช้เฉพาะเทคโนโลยีฟิล์มกรองแสงล่าสุดที่ผ่านการทดสอบในสภาวะอากาศที่สุดขั้วของเมืองไทย
+                     </p>
+                  </div>
+                  <div className="pt-12 mt-12 border-t border-slate-100 flex items-center gap-8">
+                     <div className="flex -space-x-4">
+                        {[1,2,3,4].map(i => (
+                           <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden shadow-sm">
+                              <img src={`https://i.pravatar.cc/150?u=${i}`} alt="Client" />
+                           </div>
+                        ))}
+                     </div>
+                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                       Trusted by <span className="text-slate-900">500+ Luxury Projects</span> Across Bangkok
+                     </p>
+                  </div>
+               </div>
+            </div>
          </div>
       </section>
 
