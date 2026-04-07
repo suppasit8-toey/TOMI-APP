@@ -44,19 +44,19 @@ export default async function LandingPage() {
     service1_image_url: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2070&auto=format&fit=crop',
     service2_image_url: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=2069&auto=format&fit=crop',
     service3_image_url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop',
-    services_tag: 'EXCLUSIVE RANGE',
-    services_title: 'OUR EXPERTISE',
-    service1_title: 'Residential Excellence',
-    service1_desc: 'เปลี่ยนบ้านของคุณให้เป็นเขตร้อนที่เย็นสบายด้วยฟิล์มนาโนเซรามิคระดับโลก',
-    service2_title: 'Corporate Solutions',
-    service2_desc: 'เพิ่มประสิทธิภาพการทำงานและลดค่าใช้จ่ายด้านพลังงานสำหรับอาคารสำนักงานขนาดใหญ่',
-    service3_title: 'Automotive Shield',
+    services_tag: 'กลุ่มผลิตภัณฑ์พิเศษ',
+    services_title: 'ความเชี่ยวชาญของเรา',
+    service1_title: 'ระดับพรีเมียมสำหรับที่พักอาศัย',
+    service1_desc: 'เปลี่ยนบ้านของคุณให้เป็นพื้นที่ที่เย็นสบายด้วยฟิล์มนาโนเซรามิคระดับโลก',
+    service2_title: 'โซลูชั่นสำหรับองค์กร',
+    service2_desc: 'เพิ่มประสิทธิภาพการทำงานและลดค่าใช้จ่ายด้านพลังงานสำหรับอาคารสำนักงานและองค์กร',
+    service3_title: 'การปกป้องสำหรับยานยนต์',
     service3_desc: 'ปกป้องรถยนต์คันโปรดด้วยฟิล์มกรองแสงเกรดซูเปอร์พรีเมียมที่เคลียร์ใสแต่กันความร้อนสูงสุด',
     trust_stat1_value: '10', trust_stat1_label: 'ปี+', trust_stat1_title: 'ประสบการณ์',
     trust_stat2_value: '1000', trust_stat2_label: '+', trust_stat2_title: 'โครงการที่เสร็จสิ้น',
     trust_stat3_value: '99', trust_stat3_label: '%', trust_stat3_title: 'ระดับการกันความร้อน',
     trust_stat4_value: '24/7', trust_stat4_label: '', trust_stat4_title: 'ทีมที่ปรึกษา',
-    cta_title: 'Elevate Your Environment Today',
+    cta_title: 'ยกระดับพื้นที่ของคุณตั้งแต่วันนี้',
     cta_subtitle: 'ไม่ว่าโจทย์ของคุณจะเป็นแบบไหน เรามีโซลูชั่นฟิล์มกรองแสงที่สมบูรณ์แบบรอคุณอยู่ ปรึกษาผู้เชี่ยวชาญของเราได้ทันที',
     footer_description: 'ผู้นำด้านนวัตกรรมฟิล์มกรองแสงระดับพรีเมียมสำหรับสถาปัตยกรรมและยานยนต์ มาตรฐานสากล',
   };
@@ -95,14 +95,14 @@ export default async function LandingPage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                   </span>
-                  <p className="text-[10px] font-black tracking-[0.4em] uppercase text-white/70">Architectural Film Masterclass</p>
+                  <p className="text-[10px] font-black tracking-[0.4em] uppercase text-white/70">ผู้เชี่ยวชาญด้านฟิล์มสถาปัตยกรรมระดับสากล</p>
                </div>
             </AnimatedSection>
             
             <h1 className="text-[56px] sm:text-[84px] lg:text-[120px] font-black tracking-[-0.04em] leading-[0.85] uppercase mb-12">
-              <span className="block animate-fade-in-up">The New</span>
-              <span className="block italic font-light tracking-tight text-slate-500 lowercase ml-2 animate-fade-in-up animation-delay-100">Definition of</span>
-              <span className="block animate-fade-in-up animation-delay-200 bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/40">Comfort.</span>
+              <span className="block animate-fade-in-up">นิยามใหม่</span>
+              <span className="block italic font-light tracking-tight text-slate-500 lowercase ml-2 animate-fade-in-up animation-delay-100">แห่งความ</span>
+              <span className="block animate-fade-in-up animation-delay-200 bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/40">เย็นสบาย.</span>
             </h1>
             
             <p className="text-slate-400 text-xl sm:text-2xl leading-relaxed mb-16 max-w-2xl font-light animate-fade-in-up animation-delay-300">
@@ -112,11 +112,11 @@ export default async function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center gap-8 animate-fade-in-up animation-delay-400">
               <a href="#contact" className="group relative h-20 w-full sm:w-auto px-16 bg-blue-600 overflow-hidden rounded-full flex items-center justify-center transition-all duration-700 hover:scale-105 active:scale-95 shadow-2xl shadow-blue-600/30">
                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-                 <span className="relative text-[13px] font-black tracking-[0.3em] uppercase">Initial Consultant</span>
+                 <span className="relative text-[13px] font-black tracking-[0.3em] uppercase">ปรึกษาเบื้องต้น</span>
                  <ArrowRight weight="bold" className="relative ml-4 group-hover:translate-x-2 transition-transform" />
               </a>
               <a href="#services" className="text-[12px] font-black tracking-[0.3em] uppercase text-white/40 hover:text-white transition-all underline underline-offset-[12px] decoration-white/10 hover:decoration-white">
-                Discover The Range
+                เลือกชมผลิตภัณฑ์
               </a>
             </div>
           </div>
@@ -125,7 +125,7 @@ export default async function LandingPage() {
         {/* Scroll Indicator */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 opacity-30">
            <div className="w-[1px] h-20 bg-gradient-to-b from-white to-transparent" />
-           <p className="text-[9px] font-black tracking-[0.5em] uppercase vertical-rl">Scroll</p>
+           <p className="text-[9px] font-black tracking-[0.5em] uppercase vertical-rl">เลื่อนลง</p>
         </div>
       </section>
 
@@ -143,7 +143,7 @@ export default async function LandingPage() {
                            <House weight="fill" className="text-4xl text-blue-500" />
                         </div>
                         <div>
-                           <span className="text-[11px] font-black tracking-[0.5em] uppercase text-blue-500 mb-6 block">01 / Residential</span>
+                           <span className="text-[11px] font-black tracking-[0.5em] uppercase text-blue-500 mb-6 block">01 / ที่พักอาศัย</span>
                            <h3 className="text-[48px] font-black leading-none uppercase mb-8">{content.service1_title}</h3>
                            <p className="text-slate-400 text-lg leading-relaxed max-w-md font-light">{content.service1_desc}</p>
                         </div>
@@ -164,7 +164,7 @@ export default async function LandingPage() {
                            <ArrowUpRight weight="bold" className="text-white text-3xl opacity-20 group-hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="relative z-10">
-                           <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-400 mb-4 block">02 / Enterprise</span>
+                           <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-400 mb-4 block">02 / ธุรกิจและองค์กร</span>
                            <h3 className="text-3xl font-black text-white uppercase mb-4">{content.service2_title}</h3>
                            <p className="text-slate-400 text-sm font-light leading-relaxed">{content.service2_desc}</p>
                         </div>
@@ -179,7 +179,7 @@ export default async function LandingPage() {
                               <Car weight="fill" className="text-3xl text-white" />
                            </div>
                            <div>
-                              <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-500 mb-4 block">03 / Automotive</span>
+                              <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-500 mb-4 block">03 / ยานยนต์</span>
                               <h3 className="text-3xl font-black text-white uppercase mb-4">{content.service3_title}</h3>
                               <p className="text-slate-500 text-sm font-light leading-relaxed">{content.service3_desc}</p>
                            </div>
@@ -196,16 +196,16 @@ export default async function LandingPage() {
          <div className="container mx-auto px-6 lg:px-20">
             <div className="flex flex-col lg:flex-row gap-20 items-center mb-32">
                <div className="lg:w-1/2">
-                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">Performance Metrics</p>
+                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">ประสิทธิภาพของฟิล์ม</p>
                   <h2 className="text-[56px] lg:text-[80px] font-black leading-[0.9] uppercase tracking-tighter mb-12">
-                    Visual<br /><span className="text-slate-300">Purity.</span><br />Maximum Protection.
+                    ทัศนวิสัย<br /><span className="text-slate-300">คมชัด.</span><br />การปกป้องสูงสุด.
                   </h2>
                   <div className="grid grid-cols-2 gap-10">
                      {[
-                        { val: '99%', label: 'IR Rejection', color: 'text-blue-600' },
-                        { val: '100%', label: 'UV Protection', color: 'text-slate-900' },
-                        { val: '-8°C', label: 'In-Room Reduction', color: 'text-blue-500' },
-                        { val: 'ZERO', label: 'Signal Interference', color: 'text-slate-400' },
+                        { val: '99%', label: 'กันรังสีความร้อน (IR)', color: 'text-blue-600' },
+                        { val: '100%', label: 'ป้องกันรังสี UV', color: 'text-slate-900' },
+                        { val: '-8°C', label: 'ลดอุณหภูมิภายใน', color: 'text-blue-500' },
+                        { val: 'ไม่มี', label: 'รบกวนสัญญาณ', color: 'text-slate-400' },
                      ].map((item, i) => (
                         <div key={i}>
                            <p className={`text-4xl font-black mb-1 ${item.color}`}>{item.val}</p>
@@ -219,10 +219,10 @@ export default async function LandingPage() {
                <div className="lg:w-1/2">
                   <div className="grid grid-cols-2 gap-6 w-full">
                      {[
-                       { icon: ShieldPlus, text: 'Safety Laminate', desc: 'เสริมความแข็งแกร่งให้กระจก', hover: 'bg-blue-600' },
-                       { icon: Sparkle, text: 'Crystal Clarity', desc: 'คมชัดทุกทัศนวิสัย', hover: 'bg-slate-900' },
-                       { icon: Drop, text: 'Anti-Shatter', desc: 'ป้องกันกระจกแตกร้าว', hover: 'bg-indigo-600' },
-                       { icon: SunDim, text: 'Glare Control', desc: 'ลดแสงสะท้อนรบกวนตา', hover: 'bg-slate-700' },
+                       { icon: ShieldPlus, text: 'ฟิล์มนิรภัย', desc: 'เสริมความแข็งแกร่งให้กระจก', hover: 'bg-blue-600' },
+                       { icon: Sparkle, text: 'พรีเมียมคมชัด', desc: 'คมชัดทุกทัศนวิสัย', hover: 'bg-slate-900' },
+                       { icon: Drop, text: 'ป้องกันกระจกแตก', desc: 'ป้องกันกระจกแตกกระจาย', hover: 'bg-indigo-600' },
+                       { icon: SunDim, text: 'ลดแสงสะท้อน', desc: 'ลดแสงสะท้อนรบกวนตา', hover: 'bg-slate-700' },
                      ].map((feat, i) => (
                        <AnimatedSection key={i} animation="reveal-scale" style={{ transitionDelay: `${i * 100}ms` }} className="h-full">
                           <div className={`group relative h-full aspect-square rounded-[40px] p-8 sm:p-10 flex flex-col justify-between transition-all duration-500 overflow-hidden bg-slate-50 hover:shadow-2xl hover:shadow-slate-200 hover:-translate-y-2`}>
@@ -255,16 +255,16 @@ export default async function LandingPage() {
       <section id="process" className="py-40 bg-slate-950 relative overflow-hidden">
          <div className="container mx-auto px-6 lg:px-20 relative z-10">
             <div className="text-center mb-20 lg:mb-32">
-               <p className="text-blue-500 text-[11px] font-black tracking-[0.5em] uppercase mb-8">Masterclass Pipeline</p>
+               <p className="text-blue-500 text-[11px] font-black tracking-[0.5em] uppercase mb-8">มาตรฐานการทำงานสากล</p>
                <h2 className="text-[56px] lg:text-[80px] font-black leading-[0.9] uppercase tracking-tighter text-white">
-                 The Path To<br /><span className="text-white/20">Perfection.</span>
+                 เส้นทางสู่<br /><span className="text-white/20">ความสมบูรณ์แบบ.</span>
                </h2>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                {[
                  { 
-                   step: '01', title: 'Consultation', desc: 'ทีมผู้เชี่ยวชาญศึกษาโจทย์และความต้องการ เพื่อแนะนำฟิล์มที่เหมาะสมที่สุด',
+                   step: '01', title: 'การให้คำปรึกษา', desc: 'ทีมผู้เชี่ยวชาญศึกษาโจทย์และความต้องการ เพื่อแนะนำฟิล์มที่เหมาะสมที่สุด',
                    img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1000' 
                  },
                  { 
@@ -300,15 +300,15 @@ export default async function LandingPage() {
       <section id="faq" className="py-40 bg-slate-950">
          <div className="container mx-auto px-6 max-w-4xl">
             <div className="text-center mb-24">
-               <h2 className="text-5xl font-black lowercase italic tracking-tight mb-4">the specifics.</h2>
-               <p className="text-slate-500 font-light tracking-widest uppercase text-[10px]">Everything you need to know about our service</p>
+               <h2 className="text-5xl font-black lowercase italic tracking-tight mb-4">ข้อมูลเจาะลึก.</h2>
+               <p className="text-slate-500 font-light tracking-widest uppercase text-[10px]">ทุกสิ่งที่คุณควรทราบเกี่ยวกับบริการของเรา</p>
             </div>
             
             <div className="space-y-4">
                {[
-                  { q: 'Why Nano Ceramic?', a: 'นาโนเซรามิคคือเทคโนโลยีขั้นสูงที่ไม่ใช้โลหะ ทำให้ฟิล์มไม่สะท้อนแสงเหมือนกระจกเงา แต่กันความร้อนได้ดีกว่า และไม่บล็อกสัญญาณทุกชนิด' },
-                  { q: 'Installation Standard', a: 'เราใช้เทคนิคการติดตั้งแบบไร้รอยต่อ และล้างกระจกด้วยน้ำยาเกรดพรีเมียม เพื่อให้มั่นใจว่าจะไม่มีฝุ่นหรือฟองอากาศรบกวนสายตา' },
-                  { q: 'Maintenance Guide', a: 'ฟิล์มของเราทำความสะอาดง่าย เพียงใช้น้ำเปล่าหรือน้ำยาเช็ดกระจกสูตรอ่อนโยน ฟิล์มจะยังคงความใสเหมือนใหม่ยาวนานนับสิบปี' },
+                  { q: 'ทำไมต้องนาโนเซรามิค?', a: 'นาโนเซรามิคคือเทคโนโลยีขั้นสูงที่ไม่ใช้โลหะ ทำให้ฟิล์มไม่สะท้อนแสงเหมือนกระจกเงา แต่กันความร้อนได้ดีกว่า และไม่บล็อกสัญญาณทุกชนิด' },
+                  { q: 'มาตรฐานการติดตั้ง', a: 'เราใช้เทคนิคการติดตั้งแบบไร้รอยต่อ และล้างกระจกด้วยน้ำยาเกรดพรีเมียม เพื่อให้มั่นใจว่าจะไม่มีฝุ่นหรือฟองอากาศรบกวนสายตา' },
+                  { q: 'คู่มือการดูแลรักษา', a: 'ฟิล์มของเราทำความสะอาดง่าย เพียงใช้น้ำเปล่าหรือน้ำยาเช็ดกระจกสูตรอ่อนโยน ฟิล์มจะยังคงความใสเหมือนใหม่ยาวนานนับสิบปี' },
                ].map((item, i) => (
                   <details key={i} className="group border-b border-white/5 py-4">
                      <summary className="flex items-center justify-between cursor-pointer list-none py-6">
@@ -335,14 +335,14 @@ export default async function LandingPage() {
                   {/* Floating Certificate Card */}
                   <div className="absolute -bottom-10 -right-10 bg-blue-600 p-8 rounded-[40px] text-white shadow-2xl max-w-xs animate-float">
                      <Medal weight="duotone" className="text-4xl mb-4" />
-                     <p className="text-sm font-black tracking-widest uppercase mb-2">Certified Excellence</p>
+                     <p className="text-sm font-black tracking-widest uppercase mb-2">การรับรองความเป็นเลิศ</p>
                      <p className="text-xs text-white/60 leading-relaxed font-light">เราคัดสรรฟิล์มเกรดพรีเมียมพร้อมการรับรองมาตรฐานสากล เพื่อความมั่นใจในทุกการติดตั้ง</p>
                   </div>
                </div>
                <div className="lg:w-1/2">
-                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">Established Integrity</p>
+                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">ประวัติและความน่าเชื่อถือ</p>
                   <h2 className="text-[56px] lg:text-[72px] font-black leading-[0.95] tracking-tighter uppercase mb-12">
-                    A Legacy of<br /><span className="text-slate-300">Precision.</span>
+                    ตำนานแห่ง<br /><span className="text-slate-300">ความแม่นยำ.</span>
                   </h2>
                   <div className="space-y-8 max-w-xl">
                      <p className="text-slate-500 text-lg font-light leading-relaxed">
@@ -361,7 +361,7 @@ export default async function LandingPage() {
                         ))}
                      </div>
                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                       Trusted by <span className="text-slate-900">500+ Luxury Projects</span> Across Bangkok
+                       ได้รับความไว้วางใจจาก <span className="text-slate-900">500+ โครงการหรู</span> ทั่วกรุงเทพฯ
                      </p>
                   </div>
                </div>
@@ -376,21 +376,21 @@ export default async function LandingPage() {
             <div className="grid lg:grid-cols-2 items-center gap-20">
                <div>
                   <h2 className="text-[64px] lg:text-[84px] font-black leading-[0.85] text-white uppercase mb-12">
-                    Ready For<br />The Elite<br />Shield?
+                    พร้อมสัมผัส<br />การปกป้อง<br />ระดับพรีเมียม?
                   </h2>
                   <p className="text-white/60 text-xl font-light mb-12 max-w-sm">ยกระดับมาตรฐานพื้นที่ของคุณด้วยบริการระดับไฮเอนด์จาก TOMI FILM</p>
                </div>
                <div className="flex flex-col gap-6">
                   <a href={`tel:${content.contact_phone}`} className="h-24 bg-white text-slate-950 rounded-[32px] flex items-center justify-between px-10 group hover:bg-slate-100 transition-all">
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Expert Contact</span>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ติดต่อผู้เชี่ยวชาญ</span>
                         <span className="text-2xl font-black">{content.contact_phone}</span>
                      </div>
                      <Phone weight="fill" className="text-3xl text-blue-600 group-hover:rotate-12 transition-transform" />
                   </a>
                   <a href={`https://line.me/R/ti/p/${content.contact_line_id}`} className="h-24 bg-slate-900 border border-white/10 text-white rounded-[32px] flex items-center justify-between px-10 group hover:bg-slate-800 transition-all">
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Line Official Account</span>
+                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">บัญชี Line ทางการ</span>
                         <span className="text-2xl font-black">{content.contact_line_id}</span>
                      </div>
                      <ChatCircleDots weight="fill" className="text-3xl text-[#00B900]" />
@@ -412,15 +412,15 @@ export default async function LandingPage() {
                </div>
                <div className="grid grid-cols-2 sm:grid-cols-3 gap-16">
                   <div>
-                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-8">Navigation</h4>
+                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-8">เมนู</h4>
                      <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase tracking-widest">
-                        <li><a href="#services" className="hover:text-blue-500 transition-colors">Experience</a></li>
-                        <li><a href="#film-types" className="hover:text-blue-500 transition-colors">Catalog</a></li>
-                        <li><a href="/blog" className="hover:text-blue-500 transition-colors">Journal</a></li>
+                        <li><a href="#services" className="hover:text-blue-500 transition-colors">ผลงานติดตั้ง</a></li>
+                        <li><a href="#film-types" className="hover:text-blue-500 transition-colors">แคตตาล็อก</a></li>
+                        <li><a href="/blog" className="hover:text-blue-500 transition-colors">บทความ</a></li>
                      </ul>
                   </div>
                   <div>
-                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-8">Connect</h4>
+                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-8">ติดตามเรา</h4>
                      <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase tracking-widest">
                         <li><a href="#" className="hover:text-blue-500 transition-colors">IG</a></li>
                         <li><a href="#" className="hover:text-blue-500 transition-colors">FB</a></li>

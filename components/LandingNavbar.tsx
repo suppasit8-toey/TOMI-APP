@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { ArrowUpRight, List, X } from '@phosphor-icons/react';
 
 const navLinks = [
-  { href: '#services', label: 'Services' },
-  { href: '#film-types', label: 'Products' },
-  { href: '#process', label: 'Process' },
-  { href: '#about', label: 'About' },
-  { href: '#faq', label: 'FAQ' },
-  { href: '#contact', label: 'Contact' },
-  { href: '/blog', label: 'Blog' },
+  { href: '#services', label: 'การบริการ' },
+  { href: '#film-types', label: 'ผลิตภัณฑ์' },
+  { href: '#process', label: 'ขั้นตอนการทำงาน' },
+  { href: '#about', label: 'เกี่ยวกับเรา' },
+  { href: '#faq', label: 'คำถามที่พบบ่อย' },
+  { href: '#contact', label: 'ติดต่อเรา' },
+  { href: '/blog', label: 'บทความ' },
 ];
 
 export default function LandingNavbar() {
@@ -42,7 +42,7 @@ export default function LandingNavbar() {
             
             <div className="flex items-center gap-3">
               <a href="#contact" className="hidden sm:inline-flex items-center gap-2 px-5 py-2 text-[11px] font-bold tracking-[0.2em] uppercase bg-black text-white hover:bg-black/80 transition-colors">
-                Get Started <ArrowUpRight weight="bold" className="text-sm" />
+                เริ่มต้นใช้งาน <ArrowUpRight weight="bold" className="text-sm" />
               </a>
               
               {/* Mobile Hamburger Button */}
@@ -98,9 +98,9 @@ export default function LandingNavbar() {
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center justify-center gap-2 w-full py-4 text-[13px] font-bold tracking-[0.2em] uppercase bg-black text-white hover:bg-black/80 transition-colors"
               >
-                Get Started <ArrowUpRight weight="bold" className="text-sm" />
+                เริ่มต้นใช้งาน <ArrowUpRight weight="bold" className="text-sm" />
               </a>
-              <p className="text-center mt-5 text-[10px] tracking-[0.2em] uppercase text-black/30 font-bold">TOMI FILM — Premium Window Film</p>
+              <p className="text-center mt-5 text-[10px] tracking-[0.2em] uppercase text-black/30 font-bold">TOMI FILM — ฟิล์มกรองแสงระดับพรีเมียม</p>
             </div>
           </div>
         </div>
