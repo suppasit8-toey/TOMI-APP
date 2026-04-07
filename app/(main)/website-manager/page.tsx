@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import {
   FloppyDisk, Globe, Camera, UploadSimple, Trash, Image as ImageIcon,
   SpinnerGap, Article, Plus, PencilSimple, Eye, X, CheckCircle,
-  TextT, Phone, Link as LinkIcon, Info, Hash, BookOpen
+  TextT, Phone, Link as LinkIcon, Info, Hash, BookOpen, Tag
 } from '@phosphor-icons/react';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -35,6 +35,12 @@ interface BlogPost {
   cover_image_url: string; category: string; tags: string[];
   meta_title: string; meta_description: string; published: boolean;
   created_at: string;
+}
+
+interface CatalogItem {
+  id: string; slug: string; title: string; content: string; short_description: string;
+  keywords: string; image_url: string; price_range: string; brand_label: string;
+  category_label: string; created_at: string; updated_at: string;
 }
 
 const DEFAULT_ID = '00000000-0000-0000-0000-000000000001';
@@ -67,6 +73,11 @@ const DEFAULT_CONTENT: SiteContent = {
 const EMPTY_POST: Omit<BlogPost,'id'|'created_at'> = {
   title: '', slug: '', excerpt: '', content: '', cover_image_url: '',
   category: 'ทั่วไป', tags: [], meta_title: '', meta_description: '', published: false,
+};
+
+const EMPTY_CATALOG: Omit<CatalogItem,'id'|'created_at'|'updated_at'> = {
+  slug: '', title: '', content: '', short_description: '', keywords: '',
+  image_url: '', price_range: '', brand_label: 'TOMI FILM', category_label: 'ฟิล์มสถาปัตยกรรม'
 };
 
 // ─── Image Uploader ──────────────────────────────────────────
@@ -158,7 +169,7 @@ function SectionHead({ n, label }: { n: number; label: string }) {
 
 // ─── Main Component ───────────────────────────────────────────
 export default function WebsiteManager() {
-  const [tab, setTab] = useState<'landing'|'blog'>('landing');
+  const [tab, setTab] = useState<'landing'|'blog'|'catalog'>('landing');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
@@ -170,8 +181,17 @@ export default function WebsiteManager() {
   const [postSaving, setPostSaving] = useState(false);
   const [tagInput, setTagInput] = useState('');
 
+  // Catalog state
+  const [catalogs, setCatalogs] = useState<CatalogItem[]>([]);
+  const [catalogsLoading, setCatalogsLoading] = useState(false);
+  const [editCatalog, setEditCatalog] = useState<(Omit<CatalogItem,'id'|'created_at'|'updated_at'> & { id?: string }) | null>(null);
+  const [catalogSaving, setCatalogSaving] = useState(false);
+
   useEffect(() => { fetchContent(); }, []);
-  useEffect(() => { if (tab === 'blog') fetchPosts(); }, [tab]);
+  useEffect(() => { 
+    if (tab === 'blog') fetchPosts(); 
+    if (tab === 'catalog') fetchCatalogs();
+  }, [tab]);
 
   const set = (k: keyof SiteContent, v: string) => setContent(prev => ({ ...prev, [k]: v }));
 
@@ -181,6 +201,14 @@ export default function WebsiteManager() {
       const { data } = await supabase.from('landing_page_content').select('*').eq('id', DEFAULT_ID).single();
       if (data) setContent(c => ({ ...c, ...data }));
     } catch {} finally { setLoading(false); }
+  };
+
+  const fetchCatalogs = async () => {
+    try {
+      setCatalogsLoading(true);
+      const { data } = await supabase.from('service_catalog').select('*').order('created_at', { ascending: false });
+      if (data) setCatalogs(data);
+    } catch {} finally { setCatalogsLoading(false); }
   };
 
   const fetchPosts = async () => {
@@ -250,6 +278,48 @@ export default function WebsiteManager() {
     fetchPosts();
   };
 
+  // Catalog Helpers
+  const openNewCatalog = () => setEditCatalog({ ...EMPTY_CATALOG });
+  const openEditCatalog = (c: CatalogItem) => setEditCatalog({ 
+    ...c, 
+    brand_label: c.brand_label || '', 
+    category_label: c.category_label || '', 
+    price_range: c.price_range || '', 
+    short_description: c.short_description || '', 
+    keywords: c.keywords || '', 
+    content: c.content || '', 
+    image_url: c.image_url || '' 
+  });
+  const closeEditCatalog = () => setEditCatalog(null);
+
+  const saveCatalog = async () => {
+    if (!editCatalog?.title || !editCatalog?.slug) {
+      Swal.fire('กรุณากรอกข้อมูล', 'ต้องการชื่อและ URL ปลายทาง', 'warning'); return;
+    }
+    try {
+      setCatalogSaving(true);
+      const payload = { ...editCatalog, updated_at: new Date().toISOString() };
+      if (editCatalog.id) {
+        const { error } = await supabase.from('service_catalog').update(payload).eq('id', editCatalog.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('service_catalog').insert({ ...payload, created_at: new Date().toISOString() });
+        if (error) throw error;
+      }
+      Swal.fire({ title: 'บันทึก Catalog สำเร็จ', icon: 'success', timer: 1500, showConfirmButton: false });
+      closeEditCatalog(); fetchCatalogs();
+    } catch (err: any) {
+      Swal.fire({ title: 'บันทึกไม่สำเร็จ', text: err?.message, icon: 'error' });
+    } finally { setCatalogSaving(false); }
+  };
+
+  const deleteCatalog = async (id: string, title: string) => {
+    const res = await Swal.fire({ title: `ลบ "${title}"?`, text: 'ไม่สามารถกู้คืนได้', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' });
+    if (!res.isConfirmed) return;
+    await supabase.from('service_catalog').delete().eq('id', id);
+    fetchCatalogs();
+  };
+
   if (loading) return (
     <div className="flex justify-center items-center py-32">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
@@ -275,8 +345,8 @@ export default function WebsiteManager() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-slate-100 p-1 rounded-xl w-fit">
-        {([['landing','🏠 หน้าแรก'],['blog','📝 บทความ / Blog']] as const).map(([id, label]) => (
+      <div className="flex gap-1 mb-6 bg-slate-100 p-1 rounded-xl w-fit flex-wrap">
+        {([['landing','🏠 หน้าแรก'],['catalog','🏷️ SEO Catalog'],['blog','📝 บทความ / Blog']] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${tab===id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
             {label}
@@ -562,6 +632,134 @@ export default function WebsiteManager() {
               <div className="bg-white rounded-2xl border border-slate-200 p-5">
                 <h3 className="text-sm font-bold text-slate-700 mb-3">รูปปก (Cover Image)</h3>
                 <ImageUploader label="รูปปกบทความ" value={editPost.cover_image_url} onChange={u => setEditPost(p => p ? { ...p, cover_image_url: u } : p)} hint="1200×630px แนะนำ" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════ TAB: CATALOG ══════════ */}
+      {tab === 'catalog' && !editCatalog && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">จัดการหน้า SEO Catalog</h2>
+              <p className="text-sm text-slate-500">แคตตาล็อกหน้าเว็บที่สร้างมาเพื่อทำ SEO โดยเฉพาะ</p>
+            </div>
+            <button onClick={openNewCatalog} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-all shadow-md shadow-blue-600/30">
+              <Plus weight="bold" /> สร้าง Catalog ใหม่
+            </button>
+          </div>
+
+          {catalogsLoading ? (
+            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
+          ) : catalogs.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
+              <Tag className="text-5xl text-slate-200 mx-auto mb-3" weight="thin" />
+              <p className="text-slate-400 font-medium">ยังไม่มีข้อมูล Catalog</p>
+              <p className="text-slate-300 text-sm mt-1">กดปุ่ม "สร้าง Catalog ใหม่" เพื่อเริ่มต้นดันอันดับ Google</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {catalogs.map(c => (
+                <div key={c.id} className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-4 hover:border-blue-300 hover:shadow-md transition-all">
+                  <div className="flex items-start gap-4">
+                    {c.image_url ? (
+                      <img src={c.image_url} alt={c.title} className="w-20 h-20 object-cover rounded-lg shrink-0 border border-slate-100" />
+                    ) : (
+                      <div className="w-20 h-20 bg-slate-50 rounded-lg flex items-center justify-center shrink-0 border border-slate-100">
+                        <ImageIcon className="text-2xl text-slate-300" weight="thin" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[10px] px-2 py-0.5 rounded font-bold tracking-wide bg-blue-50 text-blue-600 uppercase">
+                          {c.category_label || 'SERVICE'}
+                        </span>
+                        <a href={`/catalog/${c.slug}`} target="_blank" className="text-xs text-blue-400 hover:text-blue-600 underline truncate">/{c.slug}</a>
+                      </div>
+                      <p className="font-bold text-slate-800 text-sm leading-tight mb-1 line-clamp-2">{c.title}</p>
+                      <p className="text-xs text-slate-500 line-clamp-2">{c.short_description}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-auto pt-4 border-t border-slate-100">
+                    <button onClick={() => openEditCatalog(c)} className="flex-1 px-3 py-2 rounded-lg text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-all flex items-center justify-center gap-2">
+                      <PencilSimple weight="bold" /> แก้ไขข้อมูล
+                    </button>
+                    <button onClick={() => deleteCatalog(c.id, c.title)} className="px-3 py-2 rounded-lg text-red-500 bg-red-50 hover:bg-red-100 transition-all">
+                      <Trash weight="bold" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════ CATALOG EDITOR ══════════ */}
+      {tab === 'catalog' && editCatalog && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <button onClick={closeEditCatalog} className="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all">
+              <X weight="bold" className="text-slate-600" />
+            </button>
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">{editCatalog.id ? 'แก้ไขหน้า SEO Catalog' : 'สร้าง Catalog ใหม่'}</h2>
+            </div>
+            <div className="ml-auto">
+              <button onClick={saveCatalog} disabled={catalogSaving}
+                className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-all disabled:opacity-70 shadow-md shadow-blue-600/20">
+                {catalogSaving ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />บันทึก...</> : <><FloppyDisk weight="fill" />บันทึกแคตตาล็อก</>}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 space-y-4">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                 <h3 className="font-bold text-slate-800 mb-2">ข้อมูลหลักสำหรับ SEO</h3>
+                 <Field label="พาดหัว (H1 Title) *">
+                   <input value={editCatalog.title} onChange={e => {
+                     const t = e.target.value;
+                     setEditCatalog(p => p ? { ...p, title: t, slug: p.id ? p.slug : slugify(t) } : p);
+                   }} className={inputCls} placeholder="เช่น ติดตั้งฟิล์มอาคาร ลดความร้อน..." />
+                 </Field>
+                 <Field label="URL Slug *">
+                   <div className="flex items-center gap-2">
+                     <span className="text-slate-400 text-sm shrink-0">/catalog/</span>
+                     <input value={editCatalog.slug} onChange={e => setEditCatalog(p => p ? { ...p, slug: slugify(e.target.value) } : p)} className={inputCls} placeholder="url-friendly-name" />
+                   </div>
+                 </Field>
+                 <Field label="คำอธิบายสั้น (Short Description / Meta Desc)">
+                   <textarea value={editCatalog.short_description} onChange={e => setEditCatalog(p => p ? { ...p, short_description: e.target.value } : p)} rows={3} className={textareaCls} placeholder="อธิบายบริการสั้นๆ เพื่อให้ชวนคลิก..." />
+                 </Field>
+                 <Field label="รายละเอียดเต็ม (HTML / Rich Text รองรับ)">
+                   <textarea value={editCatalog.content} onChange={e => setEditCatalog(p => p ? { ...p, content: e.target.value } : p)} rows={10} className={textareaCls} placeholder="พิมพ์ข้อความปกติ หรือใส่แท็ก HTML ได้" />
+                 </Field>
+                 <Field label="คีย์เวิร์ด (Keywords คั่นด้วยลูกน้ำ)">
+                   <input value={editCatalog.keywords} onChange={e => setEditCatalog(p => p ? { ...p, keywords: e.target.value } : p)} className={inputCls} placeholder="ติดฟิล์มอาคาร, ฟิล์มคอนโด, ฟิล์มกันร้อน" />
+                 </Field>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                 <h3 className="font-bold text-slate-800">ข้อมูลเสริม</h3>
+                 <Field label="แบรนด์ / ร้านค้า">
+                   <input value={editCatalog.brand_label} onChange={e => setEditCatalog(p => p ? { ...p, brand_label: e.target.value } : p)} className={inputCls} />
+                 </Field>
+                 <Field label="หมวดหมู่สินค้า">
+                   <input value={editCatalog.category_label} onChange={e => setEditCatalog(p => p ? { ...p, category_label: e.target.value } : p)} className={inputCls} placeholder="เช่น ฟิล์มสถาปัตยกรรม" />
+                 </Field>
+                 <Field label="ราคาโปรโมท (เผื่อต้องการระบุ)">
+                   <input value={editCatalog.price_range} onChange={e => setEditCatalog(p => p ? { ...p, price_range: e.target.value } : p)} className={inputCls} placeholder="เช่น เริ่มต้น 50 บาท/ตร.ฟุต" />
+                 </Field>
+              </div>
+              
+              <div className="bg-white rounded-2xl border border-slate-200 p-6">
+                 <h3 className="font-bold text-slate-800 mb-3">รูปภาพประกอบแคตตาล็อก</h3>
+                 <ImageUploader label="อัปโหลดรูปภาพหลัก" value={editCatalog.image_url} onChange={u => setEditCatalog(p => p ? { ...p, image_url: u } : p)} hint="สัดส่วนภาพแบบคร่าวๆ 4:3 หรือกล้องแนวนอน" />
               </div>
             </div>
           </div>

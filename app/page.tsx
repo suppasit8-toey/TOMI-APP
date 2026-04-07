@@ -115,8 +115,8 @@ export default async function LandingPage() {
                  <span className="relative text-[13px] font-black tracking-[0.3em] uppercase">ปรึกษาเบื้องต้น</span>
                  <ArrowRight weight="bold" className="relative ml-4 group-hover:translate-x-2 transition-transform" />
               </a>
-              <a href="#services" className="text-[12px] font-black tracking-[0.3em] uppercase text-white/40 hover:text-white transition-all underline underline-offset-[12px] decoration-white/10 hover:decoration-white">
-                เลือกชมผลิตภัณฑ์
+              <a href="/catalog" className="text-[12px] font-black tracking-[0.3em] uppercase text-white/40 hover:text-white transition-all underline underline-offset-[12px] decoration-white/10 hover:decoration-white">
+                เลือกชมแคตตาล็อกสินค้า
               </a>
             </div>
           </div>
