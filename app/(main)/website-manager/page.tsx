@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import {
   FloppyDisk, Globe, Camera, UploadSimple, Trash, Image as ImageIcon,
   SpinnerGap, Article, Plus, PencilSimple, Eye, X, CheckCircle,
-  TextT, Phone, Link as LinkIcon, Info, Hash, BookOpen, Tag
+  TextT, Phone, Link as LinkIcon, Info, Hash, BookOpen, Tag, ArrowsClockwise
 } from '@phosphor-icons/react';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -169,7 +169,7 @@ function SectionHead({ n, label }: { n: number; label: string }) {
 
 // ─── Main Component ───────────────────────────────────────────
 export default function WebsiteManager() {
-  const [tab, setTab] = useState<'landing'|'blog'|'catalog'>('landing');
+  const [tab, setTab] = useState<'landing'|'blog'|'catalog'|'analytics'>('landing');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
@@ -187,10 +187,23 @@ export default function WebsiteManager() {
   const [editCatalog, setEditCatalog] = useState<(Omit<CatalogItem,'id'|'created_at'|'updated_at'> & { id?: string }) | null>(null);
   const [catalogSaving, setCatalogSaving] = useState(false);
 
+  // Analytics state
+  const [analyticsData, setAnalyticsData] = useState<any[]>([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
+  const fetchAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const { data } = await supabase.from('website_analytics').select('*').order('created_at', { ascending: false });
+      if (data) setAnalyticsData(data);
+    } catch {} finally { setAnalyticsLoading(false); }
+  };
+
   useEffect(() => { fetchContent(); }, []);
   useEffect(() => { 
     if (tab === 'blog') fetchPosts(); 
     if (tab === 'catalog') fetchCatalogs();
+    if (tab === 'analytics') fetchAnalytics();
   }, [tab]);
 
   const set = (k: keyof SiteContent, v: string) => setContent(prev => ({ ...prev, [k]: v }));
@@ -346,7 +359,7 @@ export default function WebsiteManager() {
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 bg-slate-100 p-1 rounded-xl w-fit flex-wrap">
-        {([['landing','🏠 หน้าแรก'],['catalog','🏷️ SEO Catalog'],['blog','📝 บทความ / Blog']] as const).map(([id, label]) => (
+        {([['landing','🏠 หน้าแรก'],['catalog','🏷️ SEO Catalog'],['blog','📝 บทความ / Blog'],['analytics','📊 วิเคราะห์ข้อมูล']] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${tab===id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
             {label}
@@ -763,6 +776,97 @@ export default function WebsiteManager() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ══════════ TAB: ANALYTICS ══════════ */}
+      {tab === 'analytics' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">วิเคราะห์ข้อมูลเว็บไซต์</h2>
+              <p className="text-sm text-slate-500">ติดตามยอดผู้เข้าชมและหน้าที่มีความสนใจสูงสุด</p>
+            </div>
+            <button onClick={fetchAnalytics} className="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all text-slate-600">
+              <ArrowsClockwise weight="bold" className={analyticsLoading ? 'animate-spin' : ''} />
+            </button>
+          </div>
+
+          {analyticsLoading ? (
+            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
+          ) : (
+            <>
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">เข้าชมทั้งหมด</p>
+                  <p className="text-3xl font-black text-slate-800">{analyticsData.length}</p>
+                </div>
+                <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                  <p className="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">เข้าชมวันนี้</p>
+                  <p className="text-3xl font-black text-slate-800">
+                    {analyticsData.filter(a => new Date(a.created_at).toDateString() === new Date().toDateString()).length}
+                  </p>
+                </div>
+                <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                  <p className="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-2">มือถือ (Mobile)</p>
+                  <p className="text-3xl font-black text-slate-800">
+                    {analyticsData.filter(a => a.device_type === 'Mobile').length}
+                  </p>
+                </div>
+                <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                  <p className="text-xs font-bold text-amber-500 uppercase tracking-wider mb-2">พีซี (Desktop)</p>
+                  <p className="text-3xl font-black text-slate-800">
+                    {analyticsData.filter(a => a.device_type === 'Desktop').length}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Most Popular Pages */}
+                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <h3 className="font-bold text-slate-800 text-sm">ยอดฮิต (เรียงตามยอดเข้าชม)</h3>
+                  </div>
+                  <div className="divide-y divide-slate-50 max-h-80 overflow-y-auto p-5 space-y-4">
+                    {(() => {
+                        const counts = analyticsData.reduce((acc, obj) => {
+                           const p = obj.page_path === '/' ? 'หน้าแรก (Home)' : obj.page_path;
+                           acc[p] = (acc[p] || 0) + 1; return acc;
+                        }, {} as Record<string, number>);
+                        const sorted = Object.entries(counts).sort((a: any, b: any) => b[1] - a[1]);
+                        return sorted.length > 0 ? sorted.map(([path, count]: any, i) => (
+                           <div key={i} className="flex items-center justify-between">
+                              <span className="text-sm font-semibold text-slate-700 truncate mr-4">{path}</span>
+                              <span className="font-black text-slate-800 bg-slate-100 px-3 py-1 rounded-lg text-xs border border-slate-200">{count} วิว</span>
+                           </div>
+                        )) : <div className="text-slate-400 text-center text-sm py-4">ยังไม่มีข้อมูลเข้าชม</div>;
+                    })()}
+                  </div>
+                </div>
+
+                {/* Recent Visits */}
+                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <h3 className="font-bold text-slate-800 text-sm">หน้าที่คนเข้าล่าสุด</h3>
+                  </div>
+                  <div className="divide-y divide-slate-50 max-h-80 overflow-y-auto">
+                    {analyticsData.length > 0 ? analyticsData.slice(0, 15).map((a, i) => (
+                      <div key={i} className="p-4 flex items-start justify-between hover:bg-slate-50 transition-colors">
+                        <div>
+                          <p className="font-semibold text-slate-800 text-sm">{a.page_path === '/' ? 'หน้าแรก (Home)' : a.page_path}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">{a.device_type} • {new Date(a.created_at).toLocaleString('th-TH')}</p>
+                        </div>
+                        <a href={a.url} target="_blank" className="text-blue-500 bg-blue-50 p-2 rounded-lg hover:bg-blue-100">
+                          <LinkIcon />
+                        </a>
+                      </div>
+                    )) : <div className="text-slate-400 text-center text-sm py-8">ยังไม่มีข้อมูลเข้าชม</div>}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

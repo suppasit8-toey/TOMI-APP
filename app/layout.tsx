@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Prompt, Libre_Barcode_39_Text } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/components/AuthProvider';
+import { AnalyticsTracker } from '@/components/AnalyticsTracker';
 
 const promptConfig = Prompt({
   subsets: ['thai', 'latin'],
@@ -33,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="th" className={`${promptConfig.variable} ${barcode.variable}`}>
       <body className="font-sans antialiased text-slate-800 bg-slate-50 min-h-screen pb-safe pt-safe">
+        <AnalyticsTracker />
         <AuthProvider>
           {children}
         </AuthProvider>
