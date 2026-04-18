@@ -97,7 +97,7 @@ export default async function PortfolioPage() {
               <article key={post.id}>
                 <Link href={`/portfolio/${post.slug}`} className="group block border border-black/[0.07] hover:border-black/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 rounded-xl overflow-hidden">
                   {/* Cover Image */}
-                  <div className="h-56 bg-black/5 overflow-hidden relative">
+                  <div className="aspect-[16/10] w-full bg-black/5 overflow-hidden relative">
                     {post.cover_image_url ? (
                       <img src={post.cover_image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                     ) : (
