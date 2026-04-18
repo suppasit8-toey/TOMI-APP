@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/#about', label: 'เกี่ยวกับเรา' },
   { href: '/#faq', label: 'คำถามที่พบบ่อย' },
   { href: '/#contact', label: 'ติดต่อเรา' },
+  { href: '/portfolio', label: 'ผลงาน' },
   { href: '/blog', label: 'บทความ' },
   { href: '/catalog', label: 'แคตตาล็อก' },
 ];

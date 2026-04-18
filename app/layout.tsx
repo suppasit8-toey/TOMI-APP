@@ -32,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className={`${promptConfig.variable} ${barcode.variable}`}>
-      <body className="font-sans antialiased text-slate-800 bg-slate-50 min-h-screen pb-safe pt-safe">
+    <html lang="th" className={`${promptConfig.variable} ${barcode.variable}`} suppressHydrationWarning>
+      <body className="font-sans antialiased text-slate-800 bg-slate-50 min-h-screen pb-safe pt-safe" suppressHydrationWarning>
         <AnalyticsTracker />
         <AuthProvider>
           {children}

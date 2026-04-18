@@ -43,6 +43,19 @@ interface CatalogItem {
   category_label: string; created_at: string; updated_at: string;
 }
 
+interface PortfolioImage {
+  url: string; width?: number; height?: number; caption?: string;
+}
+
+interface PortfolioPost {
+  id: string; title: string; slug: string; description: string;
+  location_name: string; location_area: string;
+  film_brand: string; film_model: string; film_type: string; film_specs: string;
+  glass_area_sqm: number; images: PortfolioImage[]; cover_image_url: string;
+  tags: string[]; meta_title: string; meta_description: string;
+  published: boolean; created_at: string;
+}
+
 const DEFAULT_ID = '00000000-0000-0000-0000-000000000001';
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -78,6 +91,13 @@ const EMPTY_POST: Omit<BlogPost,'id'|'created_at'> = {
 const EMPTY_CATALOG: Omit<CatalogItem,'id'|'created_at'|'updated_at'> = {
   slug: '', title: '', content: '', short_description: '', keywords: '',
   image_url: '', price_range: '', brand_label: 'TOMI FILM', category_label: 'ฟิล์มสถาปัตยกรรม'
+};
+
+const EMPTY_PORTFOLIO: Omit<PortfolioPost,'id'|'created_at'> = {
+  title: '', slug: '', description: '', location_name: '', location_area: '',
+  film_brand: '', film_model: '', film_type: 'ฟิล์มกันความร้อน', film_specs: '',
+  glass_area_sqm: 0, images: [], cover_image_url: '',
+  tags: [], meta_title: '', meta_description: '', published: false,
 };
 
 // ─── Image Uploader ──────────────────────────────────────────
@@ -169,7 +189,7 @@ function SectionHead({ n, label }: { n: number; label: string }) {
 
 // ─── Main Component ───────────────────────────────────────────
 export default function WebsiteManager() {
-  const [tab, setTab] = useState<'landing'|'blog'|'catalog'|'analytics'>('landing');
+  const [tab, setTab] = useState<'landing'|'blog'|'catalog'|'portfolio'|'analytics'>('landing');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
@@ -187,6 +207,14 @@ export default function WebsiteManager() {
   const [editCatalog, setEditCatalog] = useState<(Omit<CatalogItem,'id'|'created_at'|'updated_at'> & { id?: string }) | null>(null);
   const [catalogSaving, setCatalogSaving] = useState(false);
 
+  // Portfolio state
+  const [portfolios, setPortfolios] = useState<PortfolioPost[]>([]);
+  const [portfoliosLoading, setPortfoliosLoading] = useState(false);
+  const [editPortfolio, setEditPortfolio] = useState<(Omit<PortfolioPost,'id'|'created_at'> & { id?: string }) | null>(null);
+  const [portfolioSaving, setPortfolioSaving] = useState(false);
+  const [pTagInput, setPTagInput] = useState('');
+  const [imgUploading, setImgUploading] = useState(false);
+
   // Analytics state
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
@@ -199,10 +227,19 @@ export default function WebsiteManager() {
     } catch {} finally { setAnalyticsLoading(false); }
   };
 
+  const fetchPortfolios = async () => {
+    try {
+      setPortfoliosLoading(true);
+      const { data } = await supabase.from('portfolio_posts').select('*').order('created_at', { ascending: false });
+      if (data) setPortfolios(data as PortfolioPost[]);
+    } catch {} finally { setPortfoliosLoading(false); }
+  };
+
   useEffect(() => { fetchContent(); }, []);
   useEffect(() => { 
     if (tab === 'blog') fetchPosts(); 
     if (tab === 'catalog') fetchCatalogs();
+    if (tab === 'portfolio') fetchPortfolios();
     if (tab === 'analytics') fetchAnalytics();
   }, [tab]);
 
@@ -333,6 +370,99 @@ export default function WebsiteManager() {
     fetchCatalogs();
   };
 
+  // Portfolio Helpers
+  const openNewPortfolio = () => { setEditPortfolio({ ...EMPTY_PORTFOLIO }); setPTagInput(''); };
+  const openEditPortfolio = (p: PortfolioPost) => { setEditPortfolio({ ...p }); setPTagInput(''); };
+  const closeEditPortfolio = () => { setEditPortfolio(null); setPTagInput(''); };
+
+  const addPTag = () => {
+    if (!pTagInput.trim() || !editPortfolio) return;
+    setEditPortfolio(p => p ? { ...p, tags: [...(p.tags||[]), pTagInput.trim()] } : p);
+    setPTagInput('');
+  };
+  const removePTag = (i: number) => setEditPortfolio(p => p ? { ...p, tags: p.tags.filter((_,j)=>j!==i) } : p);
+
+  const handlePortfolioImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, slotIndex: number, slotCaption: string) => {
+    const file = e.target.files?.[0];
+    if (!file || !CLOUD_NAME || !UPLOAD_PRESET || !editPortfolio) return;
+    try {
+      setImgUploading(true);
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', UPLOAD_PRESET);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      const newImg: PortfolioImage = { url: data.secure_url, width: data.width, height: data.height, caption: slotCaption };
+      setEditPortfolio(p => {
+        if (!p) return p;
+        const imgs = [...(p.images || [])];
+        // Replace at slot index, or push if slot doesn't exist yet
+        if (slotIndex < imgs.length) {
+          imgs[slotIndex] = newImg;
+        } else {
+          // Fill gaps with empty slots if needed
+          while (imgs.length < slotIndex) imgs.push({ url: '', caption: '' });
+          imgs.push(newImg);
+        }
+        const validImgs = imgs.filter(img => img.url);
+        return { ...p, images: validImgs, cover_image_url: validImgs[0]?.url || '' };
+      });
+      Swal.fire({ title: 'อัพโหลดสำเร็จ!', icon: 'success', timer: 1200, showConfirmButton: false });
+    } catch (err: any) {
+      Swal.fire('อัพโหลดไม่สำเร็จ', err.message, 'error');
+    } finally {
+      setImgUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const removePortfolioImage = (i: number) => {
+    setEditPortfolio(p => {
+      if (!p) return p;
+      const imgs = p.images.filter((_,j) => j !== i);
+      const cover = imgs.length > 0 ? (p.cover_image_url === p.images[i]?.url ? imgs[0]?.url : p.cover_image_url) : '';
+      return { ...p, images: imgs, cover_image_url: cover };
+    });
+  };
+
+  const setCoverImage = (url: string) => {
+    setEditPortfolio(p => p ? { ...p, cover_image_url: url } : p);
+  };
+
+  const savePortfolio = async () => {
+    if (!editPortfolio?.title || !editPortfolio?.slug) {
+      Swal.fire('กรุณากรอกข้อมูล', 'ต้องการชื่องานและ Slug', 'warning'); return;
+    }
+    try {
+      setPortfolioSaving(true);
+      const payload = { ...editPortfolio, updated_at: new Date().toISOString() };
+      if (editPortfolio.id) {
+        const { error } = await supabase.from('portfolio_posts').update(payload).eq('id', editPortfolio.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('portfolio_posts').insert({ ...payload, created_at: new Date().toISOString() });
+        if (error) throw error;
+      }
+      Swal.fire({ title: 'บันทึกผลงานสำเร็จ!', icon: 'success', timer: 1500, showConfirmButton: false });
+      closeEditPortfolio(); fetchPortfolios();
+    } catch (err: any) {
+      Swal.fire({ title: 'บันทึกไม่สำเร็จ', text: err?.message, icon: 'error' });
+    } finally { setPortfolioSaving(false); }
+  };
+
+  const deletePortfolio = async (id: string, title: string) => {
+    const res = await Swal.fire({ title: `ลบ "${title}"?`, text: 'ไม่สามารถกู้คืนได้', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' });
+    if (!res.isConfirmed) return;
+    await supabase.from('portfolio_posts').delete().eq('id', id);
+    fetchPortfolios();
+  };
+
+  const togglePortfolioPublish = async (p: PortfolioPost) => {
+    await supabase.from('portfolio_posts').update({ published: !p.published }).eq('id', p.id);
+    fetchPortfolios();
+  };
+
   if (loading) return (
     <div className="flex justify-center items-center py-32">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
@@ -359,7 +489,7 @@ export default function WebsiteManager() {
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 bg-slate-100 p-1 rounded-xl w-fit flex-wrap">
-        {([['landing','🏠 หน้าแรก'],['catalog','🏷️ SEO Catalog'],['blog','📝 บทความ / Blog'],['analytics','📊 วิเคราะห์ข้อมูล']] as const).map(([id, label]) => (
+        {([['landing','🏠 หน้าแรก'],['portfolio','📸 ผลงาน'],['catalog','🏷️ SEO Catalog'],['blog','📝 บทความ / Blog'],['analytics','📊 วิเคราะห์ข้อมูล']] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${tab===id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
             {label}
@@ -867,6 +997,284 @@ export default function WebsiteManager() {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* ══════════ TAB: PORTFOLIO LIST ══════════ */}
+      {tab === 'portfolio' && !editPortfolio && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">ผลงานติดตั้งทั้งหมด</h2>
+              <p className="text-sm text-slate-500">โพสผลงานที่ไปติดตั้งมา พร้อมรูปและสเปกฟิล์ม ช่วยทำ SEO</p>
+            </div>
+            <button onClick={openNewPortfolio} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-all shadow-md shadow-blue-600/30">
+              <Plus weight="bold" /> สร้างผลงานใหม่
+            </button>
+          </div>
+
+          {portfoliosLoading ? (
+            <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
+          ) : portfolios.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
+              <ImageIcon className="text-5xl text-slate-200 mx-auto mb-3" weight="thin" />
+              <p className="text-slate-400 font-medium">ยังไม่มีผลงาน</p>
+              <p className="text-slate-300 text-sm mt-1">กดปุ่ม &quot;สร้างผลงานใหม่&quot; เพื่อเริ่มโพสผลงาน</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {portfolios.map(p => (
+                <div key={p.id} className="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-4 hover:border-slate-300 transition-all">
+                  {p.cover_image_url ? (
+                    <img src={p.cover_image_url} alt={p.title} className="w-20 h-14 object-cover rounded-lg shrink-0 border border-slate-100" />
+                  ) : (
+                    <div className="w-20 h-14 bg-slate-100 rounded-lg flex items-center justify-center shrink-0">
+                      <ImageIcon className="text-2xl text-slate-300" weight="thin" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-wide ${p.published ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-400'}`}>
+                        {p.published ? 'เผยแพร่แล้ว' : 'ฉบับร่าง'}
+                      </span>
+                      {p.film_type && <span className="text-xs text-blue-500 bg-blue-50 px-2 py-0.5 rounded">{p.film_type}</span>}
+                      {p.location_area && <span className="text-xs text-slate-400">📍 {p.location_area}</span>}
+                    </div>
+                    <p className="font-semibold text-slate-800 text-sm truncate">{p.title}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{p.images?.length || 0} รูป • {new Date(p.created_at).toLocaleDateString('th-TH')}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button onClick={() => togglePortfolioPublish(p)} title={p.published ? 'ซ่อน' : 'เผยแพร่'}
+                      className={`p-2 rounded-lg transition-all ${p.published ? 'text-green-600 bg-green-50 hover:bg-green-100' : 'text-slate-400 bg-slate-50 hover:bg-slate-100'}`}>
+                      <Eye weight="bold" className="text-sm" />
+                    </button>
+                    <button onClick={() => openEditPortfolio(p)} className="p-2 rounded-lg text-blue-500 bg-blue-50 hover:bg-blue-100 transition-all">
+                      <PencilSimple weight="bold" className="text-sm" />
+                    </button>
+                    <button onClick={() => deletePortfolio(p.id, p.title)} className="p-2 rounded-lg text-red-400 bg-red-50 hover:bg-red-100 transition-all">
+                      <Trash weight="bold" className="text-sm" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════ PORTFOLIO EDITOR ══════════ */}
+      {tab === 'portfolio' && editPortfolio && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <button onClick={closeEditPortfolio} className="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all">
+              <X weight="bold" className="text-slate-600" />
+            </button>
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">{editPortfolio.id ? 'แก้ไขผลงาน' : 'สร้างผลงานใหม่'}</h2>
+              <p className="text-sm text-slate-500">กรอกข้อมูลผลงาน รูปภาพ สเปกฟิล์ม และสถานที่</p>
+            </div>
+            <div className="ml-auto flex items-center gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <div className={`w-10 h-5 rounded-full transition-all ${editPortfolio.published ? 'bg-green-500' : 'bg-slate-300'} relative`}
+                  onClick={() => setEditPortfolio(p => p ? { ...p, published: !p.published } : p)}>
+                  <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${editPortfolio.published ? 'left-5' : 'left-0.5'}`} />
+                </div>
+                <span className={`text-sm font-semibold ${editPortfolio.published ? 'text-green-600' : 'text-slate-400'}`}>
+                  {editPortfolio.published ? 'เผยแพร่' : 'ฉบับร่าง'}
+                </span>
+              </label>
+              <button onClick={savePortfolio} disabled={portfolioSaving}
+                className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-all disabled:opacity-70 shadow-md shadow-blue-600/20">
+                {portfolioSaving ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />บันทึก...</> : <><FloppyDisk weight="fill" />บันทึกผลงาน</>}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Main Content */}
+            <div className="md:col-span-2 space-y-4">
+              {/* Basic Info */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                <SectionHead n={1} label="ข้อมูลผลงาน" />
+                <Field label="ชื่องาน / โครงการ *">
+                  <input value={editPortfolio.title} onChange={e => {
+                    const t = e.target.value;
+                    setEditPortfolio(p => p ? { ...p, title: t, slug: p.id ? p.slug : slugify(t) } : p);
+                  }} className={inputCls} placeholder="เช่น ติดฟิล์มอาคาร ABC Tower บางนา" />
+                </Field>
+                <Field label="Slug (URL) *">
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-400 text-sm shrink-0">/portfolio/</span>
+                    <input value={editPortfolio.slug} onChange={e => setEditPortfolio(p => p ? { ...p, slug: slugify(e.target.value) } : p)} className={inputCls} placeholder="abc-tower-bangna" />
+                  </div>
+                </Field>
+                <Field label="เนื้อหา / คอนเทนต์ (รองรับ Markdown)">
+                  <textarea value={editPortfolio.description} onChange={e => setEditPortfolio(p => p ? { ...p, description: e.target.value } : p)} rows={8} className={textareaCls} placeholder="เขียนรายละเอียดผลงาน เช่น ปัญหาที่ลูกค้าเจอ และวิธีที่เราแก้ไข..." />
+                </Field>
+              </div>
+
+              {/* Images */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                <SectionHead n={2} label="รูปภาพผลงาน (4–6 รูป)" />
+                <p className="text-xs text-slate-400">อัพโหลดรูปแต่ละช่อง — รูปช่องแรกจะเป็นรูปปกอัตโนมัติ · ถ่ายแนวนอน ขั้นต่ำ 800px</p>
+
+                {/* 6 Individual Upload Slots */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {[
+                    { emoji: '1️⃣', label: 'รูปปก — ภาพรวมอาคาร', size: '1200×800px · 3:2', isCover: true },
+                    { emoji: '2️⃣', label: 'ก่อนติดตั้ง (Before)', size: '1080×1080px · 1:1' },
+                    { emoji: '3️⃣', label: 'หลังติดตั้ง (After)', size: '1080×1080px · 1:1' },
+                    { emoji: '4️⃣', label: 'ระหว่างทำงาน', size: '1080×1080px · 1:1' },
+                    { emoji: '5️⃣', label: 'Close-up เนื้อฟิล์ม', size: '1080×1080px · 1:1' },
+                    { emoji: '6️⃣', label: 'ทีมงาน / ป้ายโครงการ', size: '1080×1080px · 1:1' },
+                  ].map((slot, i) => {
+                    const img = editPortfolio.images?.[i];
+                    const hasImage = img && img.url;
+
+                    return (
+                      <div key={i} className={`rounded-xl border-2 overflow-hidden transition-all ${
+                        hasImage
+                          ? (slot.isCover ? 'border-blue-500 shadow-lg shadow-blue-500/20' : 'border-slate-200')
+                          : 'border-dashed border-slate-300'
+                      }`}>
+                        {hasImage ? (
+                          /* — Uploaded State — */
+                          <div className="relative group">
+                            <img src={img.url} alt={slot.label} className="w-full h-36 object-cover" />
+                            {/* Size Badge */}
+                            {img.width && img.height && (
+                              <span className="absolute top-2 left-2 text-[9px] bg-black/60 text-white px-2 py-0.5 rounded-full font-mono backdrop-blur-sm">
+                                {img.width}×{img.height}
+                              </span>
+                            )}
+                            {/* Cover Badge */}
+                            {slot.isCover && (
+                              <span className="absolute top-2 right-2 text-[9px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">📷 รูปปก</span>
+                            )}
+                            {/* Hover Actions */}
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <label className="px-2 py-1 bg-white text-slate-800 rounded-lg text-[10px] font-bold hover:bg-slate-100 cursor-pointer">
+                                🔄 เปลี่ยน
+                                <input type="file" accept="image/*" onChange={e => handlePortfolioImageUpload(e, i, slot.label)} className="hidden" />
+                              </label>
+                              <button type="button" onClick={() => removePortfolioImage(i)} className="px-2 py-1 bg-red-500 text-white rounded-lg text-[10px] font-bold hover:bg-red-600">🗑️ ลบ</button>
+                            </div>
+                          </div>
+                        ) : (
+                          /* — Empty Upload State — */
+                          <label className="flex flex-col items-center justify-center h-36 cursor-pointer hover:bg-blue-50 transition-all bg-slate-50">
+                            {imgUploading ? (
+                              <><SpinnerGap weight="bold" className="text-2xl text-blue-500 animate-spin" /><span className="text-[10px] text-blue-600 font-semibold mt-1">อัพโหลด...</span></>
+                            ) : (
+                              <>
+                                <span className="text-lg mb-1">{slot.emoji}</span>
+                                <UploadSimple weight="bold" className="text-xl text-slate-400" />
+                                <span className="text-[10px] text-slate-600 font-semibold mt-1 text-center px-2 leading-tight">{slot.label}</span>
+                                <span className="text-[9px] text-slate-400 mt-0.5">{slot.size}</span>
+                              </>
+                            )}
+                            <input type="file" accept="image/*" onChange={e => handlePortfolioImageUpload(e, i, slot.label)} className="hidden" disabled={imgUploading} />
+                          </label>
+                        )}
+                        {/* Caption */}
+                        {hasImage && (
+                          <input
+                            value={img.caption || ''}
+                            onChange={e => {
+                              const val = e.target.value;
+                              setEditPortfolio(p => {
+                                if (!p) return p;
+                                const imgs = [...p.images];
+                                imgs[i] = { ...imgs[i], caption: val };
+                                return { ...p, images: imgs };
+                              });
+                            }}
+                            className="w-full text-[11px] px-3 py-2 bg-slate-50 border-t border-slate-200 focus:outline-none focus:bg-blue-50"
+                            placeholder="คำอธิบายรูป (ไม่บังคับ)"
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="text-[10px] text-slate-400 space-y-0.5 bg-slate-50 rounded-lg p-3">
+                  <p>💡 <strong>Tips:</strong> ถ่ายรูปแนวนอนจะแสดงผลดีที่สุด — ขั้นต่ำ 800px ขึ้นไป</p>
+                  <p>📱 รูปจากมือถือใช้ได้เลย ระบบแสดงขนาดจริงอัตโนมัติ</p>
+                  <p>⭐ รูปช่อง 1 จะเป็นรูปปกเสมอ (แสดงในหน้าแกลเลอรี)</p>
+                </div>
+              </div>
+
+              {/* SEO */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2"><Hash weight="bold" className="text-blue-500" /> SEO Settings</h3>
+                <Field label="Meta Title">
+                  <input value={editPortfolio.meta_title} onChange={e => setEditPortfolio(p => p ? { ...p, meta_title: e.target.value } : p)} className={inputCls} placeholder="ปล่อยว่างเพื่อใช้ชื่องาน" />
+                  <p className="text-xs text-slate-400 mt-1">{editPortfolio.meta_title.length}/60 ตัวอักษร</p>
+                </Field>
+                <Field label="Meta Description">
+                  <textarea value={editPortfolio.meta_description} onChange={e => setEditPortfolio(p => p ? { ...p, meta_description: e.target.value } : p)} rows={2} className={textareaCls} placeholder="ปล่อยว่างเพื่อใช้เนื้อหา" />
+                  <p className="text-xs text-slate-400 mt-1">{editPortfolio.meta_description.length}/160 ตัวอักษร</p>
+                </Field>
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-4">
+              {/* Film Specs */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+                <h3 className="text-sm font-bold text-slate-700">🎬 สเปกฟิล์ม</h3>
+                <Field label="แบรนด์ฟิล์ม">
+                  <input value={editPortfolio.film_brand} onChange={e => setEditPortfolio(p => p ? { ...p, film_brand: e.target.value } : p)} className={inputCls} placeholder="เช่น 3M, LLumar, V-KOOL" />
+                </Field>
+                <Field label="รุ่นฟิล์ม">
+                  <input value={editPortfolio.film_model} onChange={e => setEditPortfolio(p => p ? { ...p, film_model: e.target.value } : p)} className={inputCls} placeholder="เช่น Prestige PR70" />
+                </Field>
+                <Field label="ประเภทฟิล์ม">
+                  <select value={editPortfolio.film_type} onChange={e => setEditPortfolio(p => p ? { ...p, film_type: e.target.value } : p)} className={inputCls}>
+                    {['ฟิล์มกันความร้อน','ฟิล์มนิรภัย','ฟิล์มกรองแสง','ฟิล์มกันรังสี UV','ฟิล์มตกแต่ง','ฟิล์มรถยนต์','อื่นๆ'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </Field>
+                <Field label="สเปกเพิ่มเติม">
+                  <textarea value={editPortfolio.film_specs} onChange={e => setEditPortfolio(p => p ? { ...p, film_specs: e.target.value } : p)} rows={2} className={textareaCls} placeholder="เช่น กันร้อน 99%, กัน UV 100%" />
+                </Field>
+                <Field label="พื้นที่ติดตั้ง (ตร.ม.)">
+                  <input type="number" value={editPortfolio.glass_area_sqm || ''} onChange={e => setEditPortfolio(p => p ? { ...p, glass_area_sqm: parseFloat(e.target.value) || 0 } : p)} className={inputCls} placeholder="0" />
+                </Field>
+              </div>
+
+              {/* Location */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+                <h3 className="text-sm font-bold text-slate-700">📍 สถานที่ (สำคัญสำหรับ SEO)</h3>
+                <Field label="ชื่อสถานที่">
+                  <input value={editPortfolio.location_name} onChange={e => setEditPortfolio(p => p ? { ...p, location_name: e.target.value } : p)} className={inputCls} placeholder="เช่น ABC Tower" />
+                </Field>
+                <Field label="ย่าน / เขต / จังหวัด">
+                  <input value={editPortfolio.location_area} onChange={e => setEditPortfolio(p => p ? { ...p, location_area: e.target.value } : p)} className={inputCls} placeholder="เช่น บางนา กรุงเทพฯ" />
+                </Field>
+              </div>
+
+              {/* Tags */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+                <h3 className="text-sm font-bold text-slate-700">🏷️ Tags (คีย์เวิร์ด SEO)</h3>
+                <div className="flex gap-2">
+                  <input value={pTagInput} onChange={e => setPTagInput(e.target.value)} onKeyDown={e => e.key==='Enter'&&(e.preventDefault(),addPTag())}
+                    className={`${inputCls} flex-1`} placeholder="พิมพ์แล้วกด Enter" />
+                  <button type="button" onClick={addPTag} className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-all">
+                    <Plus weight="bold" />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {editPortfolio.tags?.map((tag, i) => (
+                    <span key={i} className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 border border-blue-100 px-2 py-1 rounded-lg">
+                      {tag}
+                      <button type="button" onClick={() => removePTag(i)} className="hover:text-red-500 transition-colors"><X weight="bold" className="text-xs" /></button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

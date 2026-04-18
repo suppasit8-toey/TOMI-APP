@@ -1,4 +1,4 @@
-import Link from 'next/link';
+?import Link from 'next/link';
 import type { Metadata } from 'next';
 import {
   ArrowRight, ShieldCheck, Thermometer, FacebookLogo, Phone, ChatCircleDots,
@@ -15,8 +15,8 @@ import LandingNavbar from '@/components/LandingNavbar';
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
-  let seoTitle = 'TOMI FILM — บริการติดตั้งฟิล์มอาคารพรีเมียม กรุงเทพฯ';
-  let seoDesc = 'TOMI FILM ผู้เชี่ยวชาญติดตั้งฟิล์มกันความร้อน ฟิล์มกรองแสง ฟิล์มนิรภัย สำหรับบ้าน อาคารสำนักงาน และรถยนต์ รับประกันยาวนาน ช่างมืออาชีพ ประเมินฟรี';
+  let seoTitle = 'TOMI FILM — �?ริ�?ารติดตั�?�?�?ิล�?มอา�?าร�?รีเมียม �?รุ�?เท�?ฯ';
+  let seoDesc = 'TOMI FILM �?ู�?เ�?ี�?ยว�?า�?ติดตั�?�?�?ิล�?ม�?ั�?�?วามร�?อ�? �?ิล�?ม�?รอ�?�?ส�? �?ิล�?ม�?ิรภัย สำหรั�?�?�?า�? อา�?ารสำ�?ั�?�?า�? �?ละรถย�?ต�? รั�?�?ระ�?ั�?ยาว�?า�? �?�?า�?มืออา�?ี�? �?ระเมิ�?�?รี';
   try {
     const { data } = await supabase.from('landing_page_content').select('seo_title,seo_description').eq('id','00000000-0000-0000-0000-000000000001').single();
     if (data?.seo_title) seoTitle = data.seo_title;
@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: seoTitle,
     description: seoDesc,
-    keywords: 'ฟิล์มกันความร้อน,ฟิล์มอาคาร,ติดฟิล์ม,TOMI FILM,ฟิล์มเซรามิค,ฟิล์มรถยนต์,กรุงเทพ',
+    keywords: '�?ิล�?ม�?ั�?�?วามร�?อ�?,�?ิล�?มอา�?าร,ติด�?ิล�?ม,TOMI FILM,�?ิล�?มเ�?รามิ�?,�?ิล�?มรถย�?ต�?,�?รุ�?เท�?',
     openGraph: { title: seoTitle, description: seoDesc, type: 'website', locale: 'th_TH' },
     twitter: { card: 'summary_large_image', title: seoTitle, description: seoDesc },
   };
@@ -33,9 +33,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LandingPage() {
   let content = {
-    hero_title: 'TOMI FILM บริการติดตั้งฟิล์มอาคารพรีเมียม',
-    hero_subtitle: 'ลดความร้อน ประหยัดพลังงาน ปกป้องสิ่งที่คุณรักด้วยฟิล์มคุณภาพสูง',
-    about_text: 'TOMI FILM ก่อตั้งด้วยความมุ่งมั่นที่จะนำเสนอนวัตกรรมฟิล์มกรองแสงที่ดีที่สุดให้กับผู้ใช้งาน ไม่ว่าจะเป็นฟิล์มเซรามิคกันความร้อนสูง ฟิล์มใสสะท้อนแสง หรือฟิล์มปกป้องความเป็นส่วนตัว เราคัดสรรแบรนด์ฟิล์มชั้นนำและใช้ช่างที่มีความชำนาญสูง',
+    hero_title: 'TOMI FILM �?ริ�?ารติดตั�?�?�?ิล�?มอา�?าร�?รีเมียม',
+    hero_subtitle: 'ลด�?วามร�?อ�? �?ระหยัด�?ลั�?�?า�? �?�?�?�?อ�?สิ�?�?ที�?�?ุณรั�?ด�?วย�?ิล�?ม�?ุณภา�?สู�?',
+    about_text: 'TOMI FILM �?�?อตั�?�?ด�?วย�?วามมุ�?�?มั�?�?ที�?�?ะ�?ำเส�?อ�?วัต�?รรม�?ิล�?ม�?รอ�?�?ส�?ที�?ดีที�?สุด�?ห�?�?ั�?�?ู�?�?�?�?�?า�? �?ม�?ว�?า�?ะเ�?�?�?�?ิล�?มเ�?รามิ�?�?ั�?�?วามร�?อ�?สู�? �?ิล�?ม�?สสะท�?อ�?�?ส�? หรือ�?ิล�?ม�?�?�?�?อ�?�?วามเ�?�?�?ส�?ว�?ตัว เรา�?ัดสรร�?�?ร�?ด�?�?ิล�?ม�?ั�?�?�?ำ�?ละ�?�?�?�?�?า�?ที�?มี�?วาม�?ำ�?า�?สู�?',
     contact_phone: '0641792417',
     contact_line_id: '@tomifilm.th',
     contact_facebook: 'https://facebook.com/tomifilm',
@@ -44,21 +44,21 @@ export default async function LandingPage() {
     service1_image_url: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2070&auto=format&fit=crop',
     service2_image_url: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=2069&auto=format&fit=crop',
     service3_image_url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop',
-    services_tag: 'กลุ่มผลิตภัณฑ์พิเศษ',
-    services_title: 'ความเชี่ยวชาญของเรา',
-    service1_title: 'ระดับพรีเมียมสำหรับที่พักอาศัย',
-    service1_desc: 'เปลี่ยนบ้านของคุณให้เป็นพื้นที่ที่เย็นสบายด้วยฟิล์มนาโนเซรามิคระดับโลก',
-    service2_title: 'โซลูชั่นสำหรับองค์กร',
-    service2_desc: 'เพิ่มประสิทธิภาพการทำงานและลดค่าใช้จ่ายด้านพลังงานสำหรับอาคารสำนักงานและองค์กร',
-    service3_title: 'การปกป้องสำหรับยานยนต์',
-    service3_desc: 'ปกป้องรถยนต์คันโปรดด้วยฟิล์มกรองแสงเกรดซูเปอร์พรีเมียมที่เคลียร์ใสแต่กันความร้อนสูงสุด',
-    trust_stat1_value: '10', trust_stat1_label: 'ปี+', trust_stat1_title: 'ประสบการณ์',
-    trust_stat2_value: '1000', trust_stat2_label: '+', trust_stat2_title: 'โครงการที่เสร็จสิ้น',
-    trust_stat3_value: '99', trust_stat3_label: '%', trust_stat3_title: 'ระดับการกันความร้อน',
-    trust_stat4_value: '24/7', trust_stat4_label: '', trust_stat4_title: 'ทีมที่ปรึกษา',
-    cta_title: 'ยกระดับพื้นที่ของคุณตั้งแต่วันนี้',
-    cta_subtitle: 'ไม่ว่าโจทย์ของคุณจะเป็นแบบไหน เรามีโซลูชั่นฟิล์มกรองแสงที่สมบูรณ์แบบรอคุณอยู่ ปรึกษาผู้เชี่ยวชาญของเราได้ทันที',
-    footer_description: 'ผู้นำด้านนวัตกรรมฟิล์มกรองแสงระดับพรีเมียมสำหรับสถาปัตยกรรมและยานยนต์ มาตรฐานสากล',
+    services_tag: '�?ลุ�?ม�?ลิตภัณฑ�?�?ิเศษ',
+    services_title: '�?วามเ�?ี�?ยว�?า�?�?อ�?เรา',
+    service1_title: 'ระดั�?�?รีเมียมสำหรั�?ที�?�?ั�?อาศัย',
+    service1_desc: 'เ�?ลี�?ย�?�?�?า�?�?อ�?�?ุณ�?ห�?เ�?�?�?�?ื�?�?ที�?ที�?เย�?�?ส�?ายด�?วย�?ิล�?ม�?า�?�?เ�?รามิ�?ระดั�?�?ล�?',
+    service2_title: '�?�?ลู�?ั�?�?สำหรั�?อ�?�?�?�?ร',
+    service2_desc: 'เ�?ิ�?ม�?ระสิท�?ิภา�?�?ารทำ�?า�?�?ละลด�?�?า�?�?�?�?�?ายด�?า�?�?ลั�?�?า�?สำหรั�?อา�?ารสำ�?ั�?�?า�?�?ละอ�?�?�?�?ร',
+    service3_title: '�?าร�?�?�?�?อ�?สำหรั�?ยา�?ย�?ต�?',
+    service3_desc: '�?�?�?�?อ�?รถย�?ต�?�?ั�?�?�?รดด�?วย�?ิล�?ม�?รอ�?�?ส�?เ�?รด�?ูเ�?อร�?�?รีเมียมที�?เ�?ลียร�?�?ส�?ต�?�?ั�?�?วามร�?อ�?สู�?สุด',
+    trust_stat1_value: '10', trust_stat1_label: '�?ี+', trust_stat1_title: '�?ระส�?�?ารณ�?',
+    trust_stat2_value: '1000', trust_stat2_label: '+', trust_stat2_title: '�?�?ร�?�?ารที�?เสร�?�?สิ�?�?',
+    trust_stat3_value: '99', trust_stat3_label: '%', trust_stat3_title: 'ระดั�?�?าร�?ั�?�?วามร�?อ�?',
+    trust_stat4_value: '24/7', trust_stat4_label: '', trust_stat4_title: 'ทีมที�?�?รึ�?ษา',
+    cta_title: 'ย�?ระดั�?�?ื�?�?ที�?�?อ�?�?ุณตั�?�?�?ต�?วั�?�?ี�?',
+    cta_subtitle: '�?ม�?ว�?า�?�?ทย�?�?อ�?�?ุณ�?ะเ�?�?�?�?�?�?�?ห�? เรามี�?�?ลู�?ั�?�?�?ิล�?ม�?รอ�?�?ส�?ที�?สม�?ูรณ�?�?�?�?รอ�?ุณอยู�? �?รึ�?ษา�?ู�?เ�?ี�?ยว�?า�?�?อ�?เรา�?ด�?ทั�?ที',
+    footer_description: '�?ู�?�?ำด�?า�?�?วัต�?รรม�?ิล�?ม�?รอ�?�?ส�?ระดั�?�?รีเมียมสำหรั�?สถา�?ัตย�?รรม�?ละยา�?ย�?ต�? มาตร�?า�?สา�?ล',
   };
 
   try {
@@ -74,22 +74,18 @@ export default async function LandingPage() {
     <div className="min-h-screen font-sans bg-slate-950 text-white selection:bg-blue-600 selection:text-white">
       <LandingNavbar />
 
-      {/* ═══ 1. ULTRA-PREMIUM HERO ═══ */}
+      {/* �?�?�? 1. ULTRA-PREMIUM HERO �?�?�? */}
       <section className="relative min-h-[100vh] flex items-center pt-24 overflow-hidden">
         {/* Cinematic Backdrop */}
         <div className="absolute inset-0 z-0">
-          <img src={content.hero_image_url || '/images/hero/banner.png'} alt="TOMI FILM – ฟิล์มกรองแสงอาคาร" className="w-full h-full object-cover opacity-40 scale-105" />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/40" />
+          <img src={content.hero_image_url} alt="Masterpiece Architecture" className="w-full h-full object-cover opacity-30 scale-105 animate-float" style={{ animationDuration: '20s' }} />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/20" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.8)_100%)]" />
         </div>
 
-        {/* Animated Accent Line */}
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-60 animate-shimmer" />
-
         {/* Floating Decorative Elements */}
-        <div className="absolute top-1/4 -right-20 w-[500px] h-[500px] bg-blue-600/8 rounded-full blur-[180px] animate-pulse" />
-        <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-indigo-600/8 rounded-full blur-[140px] animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-blue-400/5 rounded-full blur-[100px] animate-blob" />
+        <div className="absolute top-1/4 -right-20 w-96 h-96 bg-blue-600/10 rounded-full blur-[150px] animate-pulse" />
+        <div className="absolute bottom-1/4 -left-20 w-80 h-80 bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
 
         <div className="container mx-auto px-6 lg:px-20 relative z-10">
           <div className="max-w-5xl">
@@ -99,53 +95,41 @@ export default async function LandingPage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                   </span>
-                  <p className="text-[10px] font-black tracking-[0.4em] uppercase text-white/70">ผู้เชี่ยวชาญด้านฟิล์มสถาปัตยกรรมระดับสากล</p>
+                  <p className="text-[10px] font-black uppercase text-white/70">�?ู�?เ�?ี�?ยว�?า�?ด�?า�?�?ิล�?มสถา�?ัตย�?รรมระดั�?สา�?ล</p>
                </div>
             </AnimatedSection>
             
-            <h1 className="text-[56px] sm:text-[84px] lg:text-[120px] font-black tracking-[-0.04em] leading-[0.85] uppercase mb-12">
-              <span className="block animate-fade-in-up">นิยามใหม่</span>
-              <span className="block italic font-light tracking-tight text-slate-500 lowercase ml-2 animate-fade-in-up animation-delay-100">แห่งความ</span>
-              <span className="block animate-fade-in-up animation-delay-200 bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-blue-400/60">เย็นสบาย.</span>
+            <h1 className="text-[56px] sm:text-[84px] lg:text-[120px] font-black leading-tight xl:leading-none uppercase mb-12">
+              <span className="block animate-fade-in-up">�?ิยาม�?หม�?</span>
+              <span className="block italic font-light text-slate-500 lowercase ml-2 animate-fade-in-up animation-delay-100">�?ห�?�?�?วาม</span>
+              <span className="block animate-fade-in-up animation-delay-200 bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/40">เย�?�?ส�?าย.</span>
             </h1>
             
             <p className="text-slate-400 text-xl sm:text-2xl leading-relaxed mb-16 max-w-2xl font-light animate-fade-in-up animation-delay-300">
-               {content.hero_subtitle} ยกระดับการใช้ชีวิตด้วยเทคโนโลยีที่มองไม่เห็น แต่สัมผัสได้ถึงความเย็นสบาย
+               {content.hero_subtitle} ย�?ระดั�?�?าร�?�?�?�?ีวิตด�?วยเท�?�?�?�?ลยีที�?มอ�?�?ม�?เห�?�? �?ต�?สัม�?ัส�?ด�?ถึ�?�?วามเย�?�?ส�?าย
             </p>
             
             <div className="flex flex-col sm:flex-row items-center gap-8 animate-fade-in-up animation-delay-400">
               <a href="#contact" className="group relative h-20 w-full sm:w-auto px-16 bg-blue-600 overflow-hidden rounded-full flex items-center justify-center transition-all duration-700 hover:scale-105 active:scale-95 shadow-2xl shadow-blue-600/30">
                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-                 <span className="relative text-[13px] font-black tracking-[0.3em] uppercase">ปรึกษาเบื้องต้น</span>
+                 <span className="relative text-[13px] font-black tracking-[0.3em] uppercase">�?รึ�?ษาเ�?ื�?อ�?ต�?�?</span>
                  <ArrowRight weight="bold" className="relative ml-4 group-hover:translate-x-2 transition-transform" />
               </a>
-              <a href="/catalog" className="text-[12px] font-black tracking-[0.3em] uppercase text-white/40 hover:text-white transition-all underline underline-offset-[12px] decoration-white/10 hover:decoration-white">
-                เลือกชมแคตตาล็อกสินค้า
+              <a href="/catalog" className="text-[12px] font-black uppercase text-white/40 hover:text-white transition-all underline underline-offset-[12px] decoration-white/10 hover:decoration-white">
+                เลือ�?�?ม�?�?ตตาล�?อ�?สิ�?�?�?า
               </a>
             </div>
           </div>
         </div>
 
-        {/* Floating Stats Badge */}
-        <div className="hidden lg:flex absolute right-20 bottom-32 z-10 flex-col items-center gap-6 animate-fade-in-up animation-delay-700">
-           <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 text-center">
-              <p className="text-5xl font-black text-white mb-1">10+</p>
-              <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">ปี ประสบการณ์</p>
-           </div>
-           <div className="bg-blue-600/20 backdrop-blur-2xl border border-blue-500/20 rounded-[32px] p-8 text-center">
-              <p className="text-5xl font-black text-blue-400 mb-1">99%</p>
-              <p className="text-[9px] font-black text-blue-300/40 uppercase tracking-[0.3em]">กันความร้อน</p>
-           </div>
-        </div>
-
         {/* Scroll Indicator */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 opacity-30">
            <div className="w-[1px] h-20 bg-gradient-to-b from-white to-transparent" />
-           <p className="text-[9px] font-black tracking-[0.5em] uppercase vertical-rl">เลื่อนลง</p>
+           <p className="text-[9px] font-black uppercase vertical-rl">เลื�?อ�?ล�?</p>
         </div>
       </section>
 
-      {/* ═══ 2. FEATURE BENTO GRID ═══ */}
+      {/* �?�?�? 2. FEATURE BENTO GRID �?�?�? */}
       <section id="services" className="py-40 bg-slate-950 border-y border-white/5 relative">
          <div className="container mx-auto px-6 lg:px-20">
             <div className="grid lg:grid-cols-12 gap-8 h-auto lg:h-[850px]">
@@ -159,7 +143,7 @@ export default async function LandingPage() {
                            <House weight="fill" className="text-4xl text-blue-500" />
                         </div>
                         <div>
-                           <span className="text-[11px] font-black tracking-[0.5em] uppercase text-blue-500 mb-6 block">01 / ที่พักอาศัย</span>
+                           <span className="text-[11px] font-black uppercase text-blue-500 mb-6 block">01 / ที�?�?ั�?อาศัย</span>
                            <h3 className="text-[48px] font-black leading-none uppercase mb-8">{content.service1_title}</h3>
                            <p className="text-slate-400 text-lg leading-relaxed max-w-md font-light">{content.service1_desc}</p>
                         </div>
@@ -180,7 +164,7 @@ export default async function LandingPage() {
                            <ArrowUpRight weight="bold" className="text-white text-3xl opacity-20 group-hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="relative z-10">
-                           <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-400 mb-4 block">02 / ธุรกิจและองค์กร</span>
+                           <span className="text-[10px] font-black uppercase text-blue-400 mb-4 block">02 / �?ุร�?ิ�?�?ละอ�?�?�?�?ร</span>
                            <h3 className="text-3xl font-black text-white uppercase mb-4">{content.service2_title}</h3>
                            <p className="text-slate-400 text-sm font-light leading-relaxed">{content.service2_desc}</p>
                         </div>
@@ -195,7 +179,7 @@ export default async function LandingPage() {
                               <Car weight="fill" className="text-3xl text-white" />
                            </div>
                            <div>
-                              <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-500 mb-4 block">03 / ยานยนต์</span>
+                              <span className="text-[10px] font-black uppercase text-blue-500 mb-4 block">03 / ยา�?ย�?ต�?</span>
                               <h3 className="text-3xl font-black text-white uppercase mb-4">{content.service3_title}</h3>
                               <p className="text-slate-500 text-sm font-light leading-relaxed">{content.service3_desc}</p>
                            </div>
@@ -207,25 +191,25 @@ export default async function LandingPage() {
          </div>
       </section>
 
-      {/* ═══ 3. TECHNICAL SPEC & LUXURY FEATURE CARDS ═══ */}
+      {/* �?�?�? 3. TECHNICAL SPEC & LUXURY FEATURE CARDS �?�?�? */}
       <section id="film-types" className="py-40 bg-white text-slate-950 overflow-hidden">
          <div className="container mx-auto px-6 lg:px-20">
             <div className="flex flex-col lg:flex-row gap-20 items-center mb-32">
                <div className="lg:w-1/2">
-                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">ประสิทธิภาพของฟิล์ม</p>
-                  <h2 className="text-[56px] lg:text-[80px] font-black leading-[0.9] uppercase tracking-tighter mb-12">
-                    ทัศนวิสัย<br /><span className="text-slate-300">คมชัด.</span><br />การปกป้องสูงสุด.
+                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">�?ระสิท�?ิภา�?�?อ�?�?ิล�?ม</p>
+                  <h2 className="text-[56px] lg:text-[80px] font-black leading-tight xl:leading-none uppercase mb-12">
+                    ทัศ�?วิสัย<br /><span className="text-slate-300">�?ม�?ัด.</span><br />�?าร�?�?�?�?อ�?สู�?สุด.
                   </h2>
                   <div className="grid grid-cols-2 gap-10">
                      {[
-                        { val: '99%', label: 'กันรังสีความร้อน (IR)', color: 'text-blue-600' },
-                        { val: '100%', label: 'ป้องกันรังสี UV', color: 'text-slate-900' },
-                        { val: '-8°C', label: 'ลดอุณหภูมิภายใน', color: 'text-blue-500' },
-                        { val: 'ไม่มี', label: 'รบกวนสัญญาณ', color: 'text-slate-400' },
+                        { val: '99%', label: '�?ั�?รั�?สี�?วามร�?อ�? (IR)', color: 'text-blue-600' },
+                        { val: '100%', label: '�?�?อ�?�?ั�?รั�?สี UV', color: 'text-slate-900' },
+                        { val: '-8°C', label: 'ลดอุณหภูมิภาย�?�?', color: 'text-blue-500' },
+                        { val: '�?ม�?มี', label: 'ร�?�?ว�?สั�?�?าณ', color: 'text-slate-400' },
                      ].map((item, i) => (
                         <div key={i}>
                            <p className={`text-4xl font-black mb-1 ${item.color}`}>{item.val}</p>
-                           <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">{item.label}</p>
+                           <p className="text-[10px] font-black uppercase text-slate-400">{item.label}</p>
                         </div>
                      ))}
                   </div>
@@ -235,10 +219,10 @@ export default async function LandingPage() {
                <div className="lg:w-1/2">
                   <div className="grid grid-cols-2 gap-6 w-full">
                      {[
-                       { icon: ShieldPlus, text: 'ฟิล์มนิรภัย', desc: 'เสริมความแข็งแกร่งให้กระจก', hover: 'bg-blue-600' },
-                       { icon: Sparkle, text: 'พรีเมียมคมชัด', desc: 'คมชัดทุกทัศนวิสัย', hover: 'bg-slate-900' },
-                       { icon: Drop, text: 'ป้องกันกระจกแตก', desc: 'ป้องกันกระจกแตกกระจาย', hover: 'bg-indigo-600' },
-                       { icon: SunDim, text: 'ลดแสงสะท้อน', desc: 'ลดแสงสะท้อนรบกวนตา', hover: 'bg-slate-700' },
+                       { icon: ShieldPlus, text: '�?ิล�?ม�?ิรภัย', desc: 'เสริม�?วาม�?�?�?�?�?�?ร�?�?�?ห�?�?ระ�?�?', hover: 'bg-blue-600' },
+                       { icon: Sparkle, text: '�?รีเมียม�?ม�?ัด', desc: '�?ม�?ัดทุ�?ทัศ�?วิสัย', hover: 'bg-slate-900' },
+                       { icon: Drop, text: '�?�?อ�?�?ั�?�?ระ�?�?�?ต�?', desc: '�?�?อ�?�?ั�?�?ระ�?�?�?ต�?�?ระ�?าย', hover: 'bg-indigo-600' },
+                       { icon: SunDim, text: 'ลด�?ส�?สะท�?อ�?', desc: 'ลด�?ส�?สะท�?อ�?ร�?�?ว�?ตา', hover: 'bg-slate-700' },
                      ].map((feat, i) => (
                        <AnimatedSection key={i} animation="reveal-scale" style={{ transitionDelay: `${i * 100}ms` }} className="h-full">
                           <div className={`group relative h-full aspect-square rounded-[40px] p-8 sm:p-10 flex flex-col justify-between transition-all duration-500 overflow-hidden bg-slate-50 hover:shadow-2xl hover:shadow-slate-200 hover:-translate-y-2`}>
@@ -250,8 +234,8 @@ export default async function LandingPage() {
                              </div>
                              
                              <div className="relative z-10">
-                                <h4 className="text-[13px] font-black tracking-[0.2em] uppercase text-slate-900 group-hover:text-white transition-colors mb-2">{feat.text}</h4>
-                                <p className="text-[10px] font-medium text-slate-400 group-hover:text-white/60 transition-colors uppercase tracking-widest">{feat.desc}</p>
+                                <h4 className="text-[13px] font-black uppercase text-slate-900 group-hover:text-white transition-colors mb-2">{feat.text}</h4>
+                                <p className="text-[10px] font-medium text-slate-400 group-hover:text-white/60 transition-colors uppercase">{feat.desc}</p>
                              </div>
                              
                              {/* Decorative Corner Icon */}
@@ -267,33 +251,33 @@ export default async function LandingPage() {
          </div>
       </section>
 
-      {/* ═══ 3.5 PROCESS SECTION ═══ */}
+      {/* �?�?�? 3.5 PROCESS SECTION �?�?�? */}
       <section id="process" className="py-40 bg-slate-950 relative overflow-hidden">
          <div className="container mx-auto px-6 lg:px-20 relative z-10">
             <div className="text-center mb-20 lg:mb-32">
-               <p className="text-blue-500 text-[11px] font-black tracking-[0.5em] uppercase mb-8">มาตรฐานการทำงานสากล</p>
-               <h2 className="text-[56px] lg:text-[80px] font-black leading-[0.9] uppercase tracking-tighter text-white">
-                 เส้นทางสู่<br /><span className="text-white/20">ความสมบูรณ์แบบ.</span>
+               <p className="text-blue-500 text-[11px] font-black tracking-[0.5em] uppercase mb-8">มาตร�?า�?�?ารทำ�?า�?สา�?ล</p>
+               <h2 className="text-[56px] lg:text-[80px] font-black leading-tight xl:leading-none uppercase text-white">
+                 เส�?�?ทา�?สู�?<br /><span className="text-white/20">�?วามสม�?ูรณ�?�?�?�?.</span>
                </h2>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                {[
                  { 
-                   step: '01', title: 'การให้คำปรึกษา', desc: 'ทีมผู้เชี่ยวชาญศึกษาโจทย์และความต้องการ เพื่อแนะนำฟิล์มที่เหมาะสมที่สุด',
-                   img: '/images/process/consultation.png' 
+                   step: '01', title: '�?าร�?ห�?�?ำ�?รึ�?ษา', desc: 'ทีม�?ู�?เ�?ี�?ยว�?า�?ศึ�?ษา�?�?ทย�?�?ละ�?วามต�?อ�?�?าร เ�?ื�?อ�?�?ะ�?ำ�?ิล�?มที�?เหมาะสมที�?สุด',
+                   img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1000' 
                  },
                  { 
-                   step: '02', title: 'วัดขนาดอย่างแม่นยำ', desc: 'วัดขนาดกระจกด้วยความละเอียดสูงสุด เพื่อการตัดฟิล์มที่พอดีไร้ที่ติ',
-                   img: '/images/process/measurement.png' 
+                   step: '02', title: 'Precision Measure', desc: 'วัด�?�?าด�?ระ�?�?ด�?วย�?วามละเอียดสู�?สุด เ�?ื�?อ�?ารตัด�?ิล�?มที�?�?อดี�?ร�?ที�?ติ',
+                   img: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=1000' 
                  },
                  { 
-                   step: '03', title: 'ติดตั้งมืออาชีพ', desc: 'ติดตั้งโดยทีมช่างชำนาญการในห้องควบคุมฝุ่น มาตรฐานสากล',
-                   img: '/images/process/installation.png' 
+                   step: '03', title: 'Professional Install', desc: 'ติดตั�?�?�?ดยทีม�?�?า�?�?ำ�?า�?�?าร�?�?ห�?อ�?�?ว�?�?ุม�?ุ�?�? มาตร�?า�?สา�?ล',
+                   img: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=1000' 
                  },
                  { 
-                   step: '04', title: 'ตรวจสอบคุณภาพ', desc: 'ตรวจสอบความเรียบร้อย 100% ก่อนส่งมอบงานคุณภาพระดับพรีเมียม',
-                   img: '/images/process/quality-check.png' 
+                   step: '04', title: 'Quality Audit', desc: 'ตรว�?สอ�?�?วามเรีย�?ร�?อย 100% �?�?อ�?ส�?�?มอ�?�?า�?�?ุณภา�?ระดั�?�?รีเมียม',
+                   img: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=1000' 
                  },
                ].map((item, i) => (
                  <AnimatedSection key={i} animation="reveal" style={{ transitionDelay: `${i * 150}ms` }} className="h-full">
@@ -302,7 +286,7 @@ export default async function LandingPage() {
                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
                        <div className="absolute inset-0 p-10 flex flex-col justify-end">
                           <span className="text-4xl font-black text-blue-500 mb-4 block opacity-40 group-hover:opacity-100 transition-opacity italic">{item.step}</span>
-                          <h4 className="text-xl font-black text-white uppercase mb-4 tracking-tighter">{item.title}</h4>
+                          <h4 className="text-xl font-black text-white uppercase mb-4">{item.title}</h4>
                           <p className="text-slate-400 text-xs font-light leading-relaxed">{item.desc}</p>
                        </div>
                     </div>
@@ -312,23 +296,23 @@ export default async function LandingPage() {
          </div>
       </section>
 
-      {/* ═══ 4. ULTRA-MINIMAL FAQ ═══ */}
+      {/* �?�?�? 4. ULTRA-MINIMAL FAQ �?�?�? */}
       <section id="faq" className="py-40 bg-slate-950">
          <div className="container mx-auto px-6 max-w-4xl">
             <div className="text-center mb-24">
-               <h2 className="text-5xl font-black lowercase italic tracking-tight mb-4">ข้อมูลเจาะลึก.</h2>
-               <p className="text-slate-500 font-light tracking-widest uppercase text-[10px]">ทุกสิ่งที่คุณควรทราบเกี่ยวกับบริการของเรา</p>
+               <h2 className="text-5xl font-black lowercase italic mb-4">�?�?อมูลเ�?าะลึ�?.</h2>
+               <p className="text-slate-500 font-light uppercase text-[10px]">ทุ�?สิ�?�?ที�?�?ุณ�?วรทรา�?เ�?ี�?ยว�?ั�?�?ริ�?าร�?อ�?เรา</p>
             </div>
             
             <div className="space-y-4">
                {[
-                  { q: 'ทำไมต้องนาโนเซรามิค?', a: 'นาโนเซรามิคคือเทคโนโลยีขั้นสูงที่ไม่ใช้โลหะ ทำให้ฟิล์มไม่สะท้อนแสงเหมือนกระจกเงา แต่กันความร้อนได้ดีกว่า และไม่บล็อกสัญญาณทุกชนิด' },
-                  { q: 'มาตรฐานการติดตั้ง', a: 'เราใช้เทคนิคการติดตั้งแบบไร้รอยต่อ และล้างกระจกด้วยน้ำยาเกรดพรีเมียม เพื่อให้มั่นใจว่าจะไม่มีฝุ่นหรือฟองอากาศรบกวนสายตา' },
-                  { q: 'คู่มือการดูแลรักษา', a: 'ฟิล์มของเราทำความสะอาดง่าย เพียงใช้น้ำเปล่าหรือน้ำยาเช็ดกระจกสูตรอ่อนโยน ฟิล์มจะยังคงความใสเหมือนใหม่ยาวนานนับสิบปี' },
+                  { q: 'ทำ�?มต�?อ�?�?า�?�?เ�?รามิ�??', a: '�?า�?�?เ�?รามิ�?�?ือเท�?�?�?�?ลยี�?ั�?�?สู�?ที�?�?ม�?�?�?�?�?ลหะ ทำ�?ห�?�?ิล�?ม�?ม�?สะท�?อ�?�?ส�?เหมือ�?�?ระ�?�?เ�?า �?ต�?�?ั�?�?วามร�?อ�?�?ด�?ดี�?ว�?า �?ละ�?ม�?�?ล�?อ�?สั�?�?าณทุ�?�?�?ิด' },
+                  { q: 'มาตร�?า�?�?ารติดตั�?�?', a: 'เรา�?�?�?เท�?�?ิ�?�?ารติดตั�?�?�?�?�?�?ร�?รอยต�?อ �?ละล�?า�?�?ระ�?�?ด�?วย�?�?ำยาเ�?รด�?รีเมียม เ�?ื�?อ�?ห�?มั�?�?�?�?ว�?า�?ะ�?ม�?มี�?ุ�?�?หรือ�?อ�?อา�?าศร�?�?ว�?สายตา' },
+                  { q: '�?ู�?มือ�?ารดู�?ลรั�?ษา', a: '�?ิล�?ม�?อ�?เราทำ�?วามสะอาด�?�?าย เ�?ีย�?�?�?�?�?�?ำเ�?ล�?าหรือ�?�?ำยาเ�?�?ด�?ระ�?�?สูตรอ�?อ�?�?ย�? �?ิล�?ม�?ะยั�?�?�?�?วาม�?สเหมือ�?�?หม�?ยาว�?า�?�?ั�?สิ�?�?ี' },
                ].map((item, i) => (
                   <details key={i} className="group border-b border-white/5 py-4">
                      <summary className="flex items-center justify-between cursor-pointer list-none py-6">
-                        <span className="text-xl font-bold uppercase tracking-tight text-white/80 group-open:text-blue-500 transition-colors">{item.q}</span>
+                        <span className="text-xl font-bold uppercase text-white/80 group-open:text-blue-500 transition-colors">{item.q}</span>
                         <CaretDown weight="bold" className="text-white/20 group-open:rotate-180 transition-transform" />
                      </summary>
                      <div className="pb-10 pt-2">
@@ -340,7 +324,7 @@ export default async function LandingPage() {
          </div>
       </section>
 
-      {/* ═══ 4.5 ABOUT SECTION ═══ */}
+      {/* �?�?�? 4.5 ABOUT SECTION �?�?�? */}
       <section id="about" className="py-40 bg-white text-slate-900 border-t border-slate-100 overflow-hidden">
          <div className="container mx-auto px-6 lg:px-20">
             <div className="flex flex-col lg:flex-row items-center gap-20">
@@ -351,21 +335,21 @@ export default async function LandingPage() {
                   {/* Floating Certificate Card */}
                   <div className="absolute -bottom-10 -right-10 bg-blue-600 p-8 rounded-[40px] text-white shadow-2xl max-w-xs animate-float">
                      <Medal weight="duotone" className="text-4xl mb-4" />
-                     <p className="text-sm font-black tracking-widest uppercase mb-2">การรับรองความเป็นเลิศ</p>
-                     <p className="text-xs text-white/60 leading-relaxed font-light">เราคัดสรรฟิล์มเกรดพรีเมียมพร้อมการรับรองมาตรฐานสากล เพื่อความมั่นใจในทุกการติดตั้ง</p>
+                     <p className="text-sm font-black uppercase mb-2">�?ารรั�?รอ�?�?วามเ�?�?�?เลิศ</p>
+                     <p className="text-xs text-white/60 leading-relaxed font-light">เรา�?ัดสรร�?ิล�?มเ�?รด�?รีเมียม�?ร�?อม�?ารรั�?รอ�?มาตร�?า�?สา�?ล เ�?ื�?อ�?วามมั�?�?�?�?�?�?ทุ�?�?ารติดตั�?�?</p>
                   </div>
                </div>
                <div className="lg:w-1/2">
-                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">ประวัติและความน่าเชื่อถือ</p>
-                  <h2 className="text-[56px] lg:text-[72px] font-black leading-[0.95] tracking-tighter uppercase mb-12">
-                    ตำนานแห่ง<br /><span className="text-slate-300">ความแม่นยำ.</span>
+                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">�?ระวัติ�?ละ�?วาม�?�?าเ�?ื�?อถือ</p>
+                  <h2 className="text-[56px] lg:text-[72px] font-black leading-tight xl:leading-none uppercase mb-12">
+                    ตำ�?า�?�?ห�?�?<br /><span className="text-slate-300">�?วาม�?ม�?�?ยำ.</span>
                   </h2>
                   <div className="space-y-8 max-w-xl">
                      <p className="text-slate-500 text-lg font-light leading-relaxed">
                         {content.about_text}
                      </p>
                      <p className="text-slate-500 text-lg font-light leading-relaxed">
-                        ด้วยวิสัยทัศน์ที่มุ่งเน้นความเป็นเลิศ เราจึงเลือกใช้เฉพาะเทคโนโลยีฟิล์มกรองแสงล่าสุดที่ผ่านการทดสอบในสภาวะอากาศที่สุดขั้วของเมืองไทย
+                        ด�?วยวิสัยทัศ�?�?ที�?มุ�?�?เ�?�?�?�?วามเ�?�?�?เลิศ เรา�?ึ�?เลือ�?�?�?�?เ�?�?าะเท�?�?�?�?ลยี�?ิล�?ม�?รอ�?�?ส�?ล�?าสุดที�?�?�?า�?�?ารทดสอ�?�?�?สภาวะอา�?าศที�?สุด�?ั�?ว�?อ�?เมือ�?�?ทย
                      </p>
                   </div>
                   <div className="pt-12 mt-12 border-t border-slate-100 flex items-center gap-8">
@@ -376,8 +360,8 @@ export default async function LandingPage() {
                            </div>
                         ))}
                      </div>
-                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                       ได้รับความไว้วางใจจาก <span className="text-slate-900">500+ โครงการหรู</span> ทั่วกรุงเทพฯ
+                     <p className="text-[10px] font-black text-slate-400 uppercase">
+                       �?ด�?รั�?�?วาม�?ว�?วา�?�?�?�?า�? <span className="text-slate-900">500+ �?�?ร�?�?ารหรู</span> ทั�?ว�?รุ�?เท�?ฯ
                      </p>
                   </div>
                </div>
@@ -385,28 +369,28 @@ export default async function LandingPage() {
          </div>
       </section>
 
-      {/* ═══ 5. CTA EXCLUSIVE ═══ */}
+      {/* �?�?�? 5. CTA EXCLUSIVE �?�?�? */}
       <section id="contact" className="py-40 bg-blue-600 relative overflow-hidden">
          <div className="absolute top-0 right-0 w-[60%] h-full bg-slate-950 -skew-x-[20deg] translate-x-40" />
          <div className="container mx-auto px-6 lg:px-20 relative z-10">
             <div className="grid lg:grid-cols-2 items-center gap-20">
                <div>
-                  <h2 className="text-[64px] lg:text-[84px] font-black leading-[0.85] text-white uppercase mb-12">
-                    พร้อมสัมผัส<br />การปกป้อง<br />ระดับพรีเมียม?
+                  <h2 className="text-[64px] lg:text-[84px] font-black leading-tight xl:leading-none text-white uppercase mb-12">
+                    �?ร�?อมสัม�?ัส<br />�?าร�?�?�?�?อ�?<br />ระดั�?�?รีเมียม?
                   </h2>
-                  <p className="text-white/60 text-xl font-light mb-12 max-w-sm">ยกระดับมาตรฐานพื้นที่ของคุณด้วยบริการระดับไฮเอนด์จาก TOMI FILM</p>
+                  <p className="text-white/60 text-xl font-light mb-12 max-w-sm">ย�?ระดั�?มาตร�?า�?�?ื�?�?ที�?�?อ�?�?ุณด�?วย�?ริ�?ารระดั�?�?ฮเอ�?ด�?�?า�? TOMI FILM</p>
                </div>
                <div className="flex flex-col gap-6">
                   <a href={`tel:${content.contact_phone}`} className="h-24 bg-white text-slate-950 rounded-[32px] flex items-center justify-between px-10 group hover:bg-slate-100 transition-all">
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ติดต่อผู้เชี่ยวชาญ</span>
+                        <span className="text-[10px] font-black text-slate-400 uppercase mb-1">ติดต�?อ�?ู�?เ�?ี�?ยว�?า�?</span>
                         <span className="text-2xl font-black">{content.contact_phone}</span>
                      </div>
                      <Phone weight="fill" className="text-3xl text-blue-600 group-hover:rotate-12 transition-transform" />
                   </a>
                   <a href={`https://line.me/R/ti/p/${content.contact_line_id}`} className="h-24 bg-slate-900 border border-white/10 text-white rounded-[32px] flex items-center justify-between px-10 group hover:bg-slate-800 transition-all">
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">บัญชี Line ทางการ</span>
+                        <span className="text-[10px] font-black text-slate-600 uppercase mb-1">�?ั�?�?ี Line ทา�?�?าร</span>
                         <span className="text-2xl font-black">{content.contact_line_id}</span>
                      </div>
                      <ChatCircleDots weight="fill" className="text-3xl text-[#00B900]" />
@@ -416,17 +400,17 @@ export default async function LandingPage() {
          </div>
       </section>
 
-      {/* ═══ 6. LOCATION / MAP ═══ */}
+      {/* �?�?�? 6. LOCATION / MAP �?�?�? */}
       <section className="bg-slate-950 pt-20 pb-0 border-t border-white/5 relative z-10 w-full">
          <div className="container mx-auto px-6 lg:px-20 mb-12">
             <div className="flex items-center gap-4 mb-4 animate-fade-in-up">
                <div className="w-12 h-12 bg-blue-600/10 rounded-2xl flex items-center justify-center">
                    <MapPin weight="fill" className="text-2xl text-blue-500" />
                </div>
-               <h2 className="text-2xl font-black text-white uppercase">จุดให้บริการ / ที่ตั้งสาขา</h2>
+               <h2 className="text-2xl font-black text-white uppercase">�?ุด�?ห�?�?ริ�?าร / ที�?ตั�?�?สา�?า</h2>
             </div>
             <p className="text-slate-400 font-light max-w-2xl text-lg animate-fade-in-up animation-delay-100">
-               ยินดีต้อนรับสู่โชว์รูม TOMI FILM เข้ามารับคำปรึกษาพร้อมสัมผัสตัวอย่างฟิล์มทุกรุ่นด้วยตัวคุณเอง เพื่อการตัดสินใจที่สมบูรณ์แบบที่สุด
+               ยิ�?ดีต�?อ�?รั�?สู�?�?�?ว�?รูม TOMI FILM เ�?�?ามารั�?�?ำ�?รึ�?ษา�?ร�?อมสัม�?ัสตัวอย�?า�?�?ิล�?มทุ�?รุ�?�?ด�?วยตัว�?ุณเอ�? เ�?ื�?อ�?ารตัดสิ�?�?�?ที�?สม�?ูรณ�?�?�?�?ที�?สุด
             </p>
          </div>
          {/* Google Maps Embed iframe */}
@@ -449,23 +433,23 @@ export default async function LandingPage() {
          <div className="container mx-auto px-6 lg:px-20">
             <div className="flex flex-col lg:flex-row justify-between items-start gap-20 mb-20">
                <div className="max-w-sm">
-                  <span className="text-3xl font-black tracking-tighter uppercase mb-10 block">TOMIFILM.</span>
+                  <span className="text-3xl font-black uppercase mb-10 block">TOMIFILM.</span>
                   <p className="text-slate-500 font-light leading-loose text-sm italic">
-                    "มอบสิ่งที่ดีที่สุดให้กับกระจกทุกบาน คือพันธกิจที่เรายึดถือมาตลอดทศวรรษ"
+                    "มอ�?สิ�?�?ที�?ดีที�?สุด�?ห�?�?ั�?�?ระ�?�?ทุ�?�?า�? �?ือ�?ั�?�?�?ิ�?ที�?เรายึดถือมาตลอดทศวรรษ"
                   </p>
                </div>
                <div className="grid grid-cols-2 sm:grid-cols-3 gap-16">
                   <div>
-                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-8">เมนู</h4>
-                     <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase tracking-widest">
-                        <li><a href="#services" className="hover:text-blue-500 transition-colors">ผลงานติดตั้ง</a></li>
-                        <li><a href="#film-types" className="hover:text-blue-500 transition-colors">แคตตาล็อก</a></li>
-                        <li><a href="/blog" className="hover:text-blue-500 transition-colors">บทความ</a></li>
+                     <h4 className="text-[10px] font-black text-white uppercase mb-8">เม�?ู</h4>
+                     <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase">
+                        <li><a href="#services" className="hover:text-blue-500 transition-colors">�?ล�?า�?ติดตั�?�?</a></li>
+                        <li><a href="#film-types" className="hover:text-blue-500 transition-colors">�?�?ตตาล�?อ�?</a></li>
+                        <li><a href="/blog" className="hover:text-blue-500 transition-colors">�?ท�?วาม</a></li>
                      </ul>
                   </div>
                   <div>
-                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-8">ติดตามเรา</h4>
-                     <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase tracking-widest">
+                     <h4 className="text-[10px] font-black text-white uppercase mb-8">ติดตามเรา</h4>
+                     <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase">
                         <li><a href="#" className="hover:text-blue-500 transition-colors">IG</a></li>
                         <li><a href="#" className="hover:text-blue-500 transition-colors">FB</a></li>
                         <li><a href="#" className="hover:text-blue-500 transition-colors">LI</a></li>
@@ -482,3 +466,4 @@ export default async function LandingPage() {
     </div>
   );
 }
+
