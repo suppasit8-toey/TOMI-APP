@@ -40,12 +40,12 @@ export default function LandingNavbar() {
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-10">
               {navLinks.map(item => (
-                <Link key={item.href} href={item.href} className="text-black/50 hover:text-black transition-colors text-[13px] font-medium tracking-widest uppercase">{item.label}</Link>
+                <Link key={item.href} href={item.href} className="text-black/50 hover:text-black transition-colors text-[13px] font-medium tracking-wide uppercase">{item.label}</Link>
               ))}
             </div>
             
             <div className="flex items-center gap-3">
-              <Link href="/#contact" className="hidden sm:inline-flex items-center gap-2 px-5 py-2 text-[11px] font-bold tracking-[0.2em] uppercase bg-black text-white hover:bg-black/80 transition-colors">
+              <Link href="/#contact" className="hidden sm:inline-flex items-center gap-2 px-5 py-2 text-[11px] font-bold tracking-wide uppercase bg-black text-white hover:bg-black/80 transition-colors">
                 เริ่มต้นใช้งาน <ArrowUpRight weight="bold" className="text-sm" />
               </Link>
               
@@ -89,7 +89,7 @@ export default function LandingNavbar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block py-5 border-b border-black/10 text-[16px] font-bold tracking-[0.25em] uppercase text-black hover:text-black/60 hover:pl-2 transition-all duration-300"
+                  className="block py-5 border-b border-black/10 text-[16px] font-bold tracking-wide uppercase text-black hover:text-black/60 hover:pl-2 transition-all duration-300"
                 >
                   {item.label}
                 </Link>
@@ -100,11 +100,11 @@ export default function LandingNavbar() {
               <Link
                 href="/#contact"
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-4 text-[13px] font-bold tracking-[0.2em] uppercase bg-black text-white hover:bg-black/80 transition-colors"
+                className="flex items-center justify-center gap-2 w-full py-4 text-[13px] font-bold tracking-wide uppercase bg-black text-white hover:bg-black/80 transition-colors"
               >
                 เริ่มต้นใช้งาน <ArrowUpRight weight="bold" className="text-sm" />
               </Link>
-              <p className="text-center mt-5 text-[10px] tracking-[0.2em] uppercase text-black/30 font-bold">TOMI FILM — ฟิล์มกรองแสงระดับพรีเมียม</p>
+              <p className="text-center mt-5 text-[10px] tracking-wide uppercase text-black/30 font-bold">TOMI FILM — ฟิล์มกรองแสงระดับพรีเมียม</p>
             </div>
           </div>
         </div>

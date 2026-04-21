@@ -382,7 +382,7 @@ export default function WebsiteManager() {
   };
   const removePTag = (i: number) => setEditPortfolio(p => p ? { ...p, tags: p.tags.filter((_,j)=>j!==i) } : p);
 
-  const handlePortfolioImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, slotIndex: number, slotCaption: string) => {
+  const handlePortfolioImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !CLOUD_NAME || !UPLOAD_PRESET || !editPortfolio) return;
     try {
@@ -393,22 +393,39 @@ export default function WebsiteManager() {
       const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
       if (!res.ok) throw new Error('Upload failed');
       const data = await res.json();
-      const newImg: PortfolioImage = { url: data.secure_url, width: data.width, height: data.height, caption: slotCaption };
+      const newImg: PortfolioImage = { url: data.secure_url, width: data.width, height: data.height, caption: '' };
       setEditPortfolio(p => {
         if (!p) return p;
-        const imgs = [...(p.images || [])];
-        // Replace at slot index, or push if slot doesn't exist yet
-        if (slotIndex < imgs.length) {
-          imgs[slotIndex] = newImg;
-        } else {
-          // Fill gaps with empty slots if needed
-          while (imgs.length < slotIndex) imgs.push({ url: '', caption: '' });
-          imgs.push(newImg);
-        }
-        const validImgs = imgs.filter(img => img.url);
-        return { ...p, images: validImgs, cover_image_url: validImgs[0]?.url || '' };
+        const imgs = [...(p.images || []), newImg];
+        return { ...p, images: imgs, cover_image_url: imgs[0]?.url || p.cover_image_url };
       });
       Swal.fire({ title: 'อัพโหลดสำเร็จ!', icon: 'success', timer: 1200, showConfirmButton: false });
+    } catch (err: any) {
+      Swal.fire('อัพโหลดไม่สำเร็จ', err.message, 'error');
+    } finally {
+      setImgUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const replacePortfolioImage = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file || !CLOUD_NAME || !UPLOAD_PRESET || !editPortfolio) return;
+    try {
+      setImgUploading(true);
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', UPLOAD_PRESET);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      setEditPortfolio(p => {
+        if (!p) return p;
+        const imgs = [...p.images];
+        imgs[index] = { ...imgs[index], url: data.secure_url, width: data.width, height: data.height };
+        return { ...p, images: imgs, cover_image_url: imgs[0]?.url || '' };
+      });
+      Swal.fire({ title: 'เปลี่ยนรูปสำเร็จ!', icon: 'success', timer: 1200, showConfirmButton: false });
     } catch (err: any) {
       Swal.fire('อัพโหลดไม่สำเร็จ', err.message, 'error');
     } finally {
@@ -1115,93 +1132,90 @@ export default function WebsiteManager() {
 
               {/* Images */}
               <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
-                <SectionHead n={2} label="รูปภาพผลงาน (4–6 รูป)" />
-                <p className="text-xs text-slate-400">อัพโหลดรูปแต่ละช่อง — รูปช่องแรกจะเป็นรูปปกอัตโนมัติ · ถ่ายแนวนอน ขั้นต่ำ 800px</p>
+                <SectionHead n={2} label="รูปภาพผลงาน (ไม่จำกัดจำนวน)" />
+                <p className="text-xs text-slate-400">อัพโหลดรูปก่อน แล้วเลือกประเภทรูปภายหลัง — รูปแรกจะเป็นรูปปกอัตโนมัติ · ถ่ายแนวนอน ขั้นต่ำ 800px</p>
 
-                {/* 6 Individual Upload Slots */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {[
-                    { emoji: '1️⃣', label: 'รูปปก — ภาพรวมอาคาร', size: '1200×800px · 3:2', isCover: true },
-                    { emoji: '2️⃣', label: 'ก่อนติดตั้ง (Before)', size: '1080×1080px · 1:1' },
-                    { emoji: '3️⃣', label: 'หลังติดตั้ง (After)', size: '1080×1080px · 1:1' },
-                    { emoji: '4️⃣', label: 'ระหว่างทำงาน', size: '1080×1080px · 1:1' },
-                    { emoji: '5️⃣', label: 'Close-up เนื้อฟิล์ม', size: '1080×1080px · 1:1' },
-                    { emoji: '6️⃣', label: 'ทีมงาน / ป้ายโครงการ', size: '1080×1080px · 1:1' },
-                  ].map((slot, i) => {
-                    const img = editPortfolio.images?.[i];
-                    const hasImage = img && img.url;
+                {/* Upload Button */}
+                <label className={`flex flex-col items-center justify-center h-28 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                  imgUploading ? 'border-blue-400 bg-blue-50' : 'border-slate-300 bg-slate-50 hover:bg-blue-50 hover:border-blue-300'
+                }`}>
+                  {imgUploading ? (
+                    <><SpinnerGap weight="bold" className="text-3xl text-blue-500 animate-spin" /><span className="text-sm text-blue-600 font-semibold mt-1">กำลังอัพโหลด...</span></>
+                  ) : (
+                    <>
+                      <UploadSimple weight="bold" className="text-3xl text-slate-400" />
+                      <span className="text-sm text-slate-600 font-semibold mt-1">คลิกเพื่ออัพโหลดรูปภาพ</span>
+                      <span className="text-[10px] text-slate-400 mt-0.5">JPG, PNG, WebP · จำนวนรูปปัจจุบัน: {editPortfolio.images?.length || 0} รูป</span>
+                    </>
+                  )}
+                  <input type="file" accept="image/*" className="hidden" onChange={handlePortfolioImageUpload} disabled={imgUploading} />
+                </label>
 
-                    return (
+                {/* Uploaded Images Grid */}
+                {editPortfolio.images && editPortfolio.images.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {editPortfolio.images.map((img, i) => (
                       <div key={i} className={`rounded-xl border-2 overflow-hidden transition-all ${
-                        hasImage
-                          ? (slot.isCover ? 'border-blue-500 shadow-lg shadow-blue-500/20' : 'border-slate-200')
-                          : 'border-dashed border-slate-300'
+                        i === 0 ? 'border-blue-500 shadow-lg shadow-blue-500/20' : 'border-slate-200 hover:border-slate-300'
                       }`}>
-                        {hasImage ? (
-                          /* — Uploaded State — */
-                          <div className="relative group">
-                            <img src={img.url} alt={slot.label} className="w-full h-36 object-cover" />
-                            {/* Size Badge */}
-                            {img.width && img.height && (
-                              <span className="absolute top-2 left-2 text-[9px] bg-black/60 text-white px-2 py-0.5 rounded-full font-mono backdrop-blur-sm">
-                                {img.width}×{img.height}
-                              </span>
-                            )}
-                            {/* Cover Badge */}
-                            {slot.isCover && (
-                              <span className="absolute top-2 right-2 text-[9px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">📷 รูปปก</span>
-                            )}
-                            {/* Hover Actions */}
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                              <label className="px-2 py-1 bg-white text-slate-800 rounded-lg text-[10px] font-bold hover:bg-slate-100 cursor-pointer">
-                                🔄 เปลี่ยน
-                                <input type="file" accept="image/*" onChange={e => handlePortfolioImageUpload(e, i, slot.label)} className="hidden" />
-                              </label>
-                              <button type="button" onClick={() => removePortfolioImage(i)} className="px-2 py-1 bg-red-500 text-white rounded-lg text-[10px] font-bold hover:bg-red-600">🗑️ ลบ</button>
-                            </div>
+                        <div className="relative group">
+                          <img src={img.url} alt={img.caption || `รูปที่ ${i + 1}`} className="w-full h-36 object-cover" />
+                          {/* Size Badge */}
+                          {img.width && img.height && (
+                            <span className="absolute top-2 left-2 text-[9px] bg-black/60 text-white px-2 py-0.5 rounded-full font-mono backdrop-blur-sm">
+                              {img.width}×{img.height}
+                            </span>
+                          )}
+                          {/* Cover Badge */}
+                          {i === 0 && (
+                            <span className="absolute top-2 right-2 text-[9px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">📷 รูปปก</span>
+                          )}
+                          {/* Order Badge */}
+                          <span className="absolute bottom-2 left-2 text-[10px] bg-black/60 text-white w-5 h-5 rounded-full flex items-center justify-center font-bold backdrop-blur-sm">
+                            {i + 1}
+                          </span>
+                          {/* Hover Actions */}
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <label className="px-2 py-1 bg-white text-slate-800 rounded-lg text-[10px] font-bold hover:bg-slate-100 cursor-pointer">
+                              🔄 เปลี่ยน
+                              <input type="file" accept="image/*" onChange={e => replacePortfolioImage(e, i)} className="hidden" />
+                            </label>
+                            <button type="button" onClick={() => removePortfolioImage(i)} className="px-2 py-1 bg-red-500 text-white rounded-lg text-[10px] font-bold hover:bg-red-600">🗑️ ลบ</button>
                           </div>
-                        ) : (
-                          /* — Empty Upload State — */
-                          <label className="flex flex-col items-center justify-center h-36 cursor-pointer hover:bg-blue-50 transition-all bg-slate-50">
-                            {imgUploading ? (
-                              <><SpinnerGap weight="bold" className="text-2xl text-blue-500 animate-spin" /><span className="text-[10px] text-blue-600 font-semibold mt-1">อัพโหลด...</span></>
-                            ) : (
-                              <>
-                                <span className="text-lg mb-1">{slot.emoji}</span>
-                                <UploadSimple weight="bold" className="text-xl text-slate-400" />
-                                <span className="text-[10px] text-slate-600 font-semibold mt-1 text-center px-2 leading-tight">{slot.label}</span>
-                                <span className="text-[9px] text-slate-400 mt-0.5">{slot.size}</span>
-                              </>
-                            )}
-                            <input type="file" accept="image/*" onChange={e => handlePortfolioImageUpload(e, i, slot.label)} className="hidden" disabled={imgUploading} />
-                          </label>
-                        )}
-                        {/* Caption */}
-                        {hasImage && (
-                          <input
-                            value={img.caption || ''}
-                            onChange={e => {
-                              const val = e.target.value;
-                              setEditPortfolio(p => {
-                                if (!p) return p;
-                                const imgs = [...p.images];
-                                imgs[i] = { ...imgs[i], caption: val };
-                                return { ...p, images: imgs };
-                              });
-                            }}
-                            className="w-full text-[11px] px-3 py-2 bg-slate-50 border-t border-slate-200 focus:outline-none focus:bg-blue-50"
-                            placeholder="คำอธิบายรูป (ไม่บังคับ)"
-                          />
-                        )}
+                        </div>
+                        {/* Category Dropdown */}
+                        <select
+                          value={img.caption || ''}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setEditPortfolio(p => {
+                              if (!p) return p;
+                              const imgs = [...p.images];
+                              imgs[i] = { ...imgs[i], caption: val };
+                              return { ...p, images: imgs };
+                            });
+                          }}
+                          className="w-full text-[11px] px-3 py-2 bg-slate-50 border-t border-slate-200 focus:outline-none focus:bg-blue-50 cursor-pointer"
+                        >
+                          <option value="">— เลือกประเภทรูป —</option>
+                          <option value="รูปปก — ภาพรวมอาคาร">📸 รูปปก — ภาพรวมอาคาร</option>
+                          <option value="ก่อนติดตั้ง (Before)">🔲 ก่อนติดตั้ง (Before)</option>
+                          <option value="หลังติดตั้ง (After)">✅ หลังติดตั้ง (After)</option>
+                          <option value="รูป ก่อน VS หลัง">✨ รูป ก่อน VS หลัง</option>
+                          <option value="ระหว่างทำงาน">🔧 ระหว่างทำงาน</option>
+                          <option value="Close-up เนื้อฟิล์ม">🔍 Close-up เนื้อฟิล์ม</option>
+                          <option value="ทีมงาน / ป้ายโครงการ">👥 ทีมงาน / ป้ายโครงการ</option>
+                        </select>
                       </div>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="text-[10px] text-slate-400 space-y-0.5 bg-slate-50 rounded-lg p-3">
                   <p>💡 <strong>Tips:</strong> ถ่ายรูปแนวนอนจะแสดงผลดีที่สุด — ขั้นต่ำ 800px ขึ้นไป</p>
                   <p>📱 รูปจากมือถือใช้ได้เลย ระบบแสดงขนาดจริงอัตโนมัติ</p>
-                  <p>⭐ รูปช่อง 1 จะเป็นรูปปกเสมอ (แสดงในหน้าแกลเลอรี)</p>
+                  <p>⭐ รูปแรกที่อัพโหลดจะเป็นรูปปกอัตโนมัติ (แสดงในหน้าแกลเลอรี)</p>
+                  <p>🏷️ เลือกประเภทรูปจาก dropdown ด้านล่างรูปแต่ละรูป</p>
                 </div>
               </div>
 

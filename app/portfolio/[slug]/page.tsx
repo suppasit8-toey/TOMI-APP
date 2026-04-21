@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
   ArrowLeft, MapPin, Ruler, Tag, CalendarBlank, X,
-  ArrowRight as ArrowR, CaretLeft, CaretRight, Buildings
+  ArrowRight as ArrowR, CaretLeft, CaretRight, Buildings, Sparkle
 } from '@phosphor-icons/react';
 
 interface PortfolioImage {
@@ -96,13 +96,14 @@ export default function PortfolioDetailPage() {
     { label: 'แบรนด์ฟิล์ม', value: post.film_brand },
     { label: 'รุ่น', value: post.film_model },
     { label: 'ประเภท', value: post.film_type },
-    { label: 'สเปก', value: post.film_specs },
     { label: 'พื้นที่ติดตั้ง', value: post.glass_area_sqm > 0 ? `${post.glass_area_sqm} ตร.ม.` : '' },
     { label: 'สถานที่', value: [post.location_name, post.location_area].filter(Boolean).join(', ') },
   ].filter(s => s.value);
 
+  const parsedSpecs = post.film_specs ? post.film_specs.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-[#f8f9fa] font-sans selection:bg-blue-500/30">
       {/* JSON-LD */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         '@context': 'https://schema.org',
@@ -121,97 +122,110 @@ export default function PortfolioDetailPage() {
         },
       })}} />
 
-      {/* Cover Hero */}
-      {post.cover_image_url && (
-        <div className="relative h-[45vh] sm:h-[55vh] bg-black overflow-hidden">
-          <img src={post.cover_image_url} alt={post.title} className="absolute inset-0 w-full h-full object-cover opacity-70" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-        </div>
-      )}
+      {/* Hero Section */}
+      <div className="relative min-h-[65vh] flex items-end pb-16 sm:pb-24 pt-32 px-6 sm:px-10 overflow-hidden bg-[#0a0f18]">
+        {/* Background Layers */}
+        {post.cover_image_url && (
+          <div className="absolute inset-0 z-0">
+            <img src={post.cover_image_url} alt={post.title} className="w-full h-full object-cover opacity-60" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18] via-[#0a0f18]/80 to-[#0a0f18]/20" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f18]/90 via-transparent to-transparent" />
+          </div>
+        )}
+        
+        {/* Ambient Glow */}
+        <div className="absolute top-0 right-0 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-blue-600/20 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-[8000ms] z-0" />
+        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-indigo-500/20 blur-[100px] rounded-full mix-blend-screen z-0" />
 
-      {/* Header */}
-      <header className={`${post.cover_image_url ? 'bg-[#111318] text-white' : 'bg-[#111318] text-white pt-24'} px-6 sm:px-10 py-12`}>
-        <div className="max-w-[900px] mx-auto">
-          <Link href="/portfolio" className="inline-flex items-center gap-2 text-white/40 hover:text-white/80 text-sm font-light transition-colors mb-6">
-            <ArrowLeft weight="bold" /> กลับไปผลงานทั้งหมด
+        <div className="max-w-[1100px] mx-auto w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          <Link href="/portfolio" className="group inline-flex items-center gap-2 text-white/50 hover:text-white text-[13px] font-medium transition-all mb-8 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/5">
+            <ArrowLeft weight="bold" className="group-hover:-translate-x-1 transition-transform" /> กลับหน้ารวมผลงาน
           </Link>
 
-          <div className="flex flex-wrap items-center gap-4 mb-6">
+          <div className="flex flex-wrap items-center gap-3 mb-6">
             {post.film_type && (
-              <span className="text-[10px] tracking-[0.2em] uppercase text-white/40 font-bold bg-white/10 px-3 py-1">{post.film_type}</span>
-            )}
-            {(post.location_name || post.location_area) && (
-              <span className="text-[11px] text-white/30 font-light flex items-center gap-1">
-                <MapPin weight="fill" className="text-xs text-blue-400" />
-                {[post.location_name, post.location_area].filter(Boolean).join(', ')}
+              <span className="text-[11px] tracking-[0.2em] uppercase font-bold text-blue-300 bg-blue-500/10 border border-blue-500/20 px-3 py-1.5 rounded-full backdrop-blur-sm shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                {post.film_type}
               </span>
             )}
-            <span className="text-[11px] text-white/30 font-light flex items-center gap-1">
-              <CalendarBlank weight="regular" className="text-xs" />
+            <span className="text-[12px] text-white/60 font-light flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/5">
+              <CalendarBlank weight="duotone" className="text-sm" />
               {new Date(post.created_at).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight uppercase leading-[1.1]">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] mb-6 drop-shadow-xl text-balance">
             {post.title}
           </h1>
 
-          {post.tags?.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-6">
-              {post.tags.map((tag: string) => (
-                <span key={tag} className="text-[11px] text-white/30 border border-white/10 px-2.5 py-1 font-light flex items-center gap-1">
-                  <Tag weight="regular" className="text-xs" />{tag}
-                </span>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap items-center max-w-3xl gap-4">
+            {(post.location_name || post.location_area) && (
+              <div className="text-sm sm:text-base text-white/80 font-light flex items-center gap-2">
+                <MapPin weight="fill" className="text-lg text-blue-400 drop-shadow-md" />
+                {[post.location_name, post.location_area].filter(Boolean).join(', ')}
+              </div>
+            )}
+          </div>
         </div>
-      </header>
+      </div>
 
-      {/* Main Content */}
-      <div className="max-w-[900px] mx-auto px-6 sm:px-10 py-16">
-        <div className="grid md:grid-cols-3 gap-12">
-          {/* Left: Content */}
-          <div className="md:col-span-2">
-            {/* Image Gallery */}
+      {/* Main Content Area */}
+      <div className="max-w-[1100px] mx-auto px-6 sm:px-10 py-16 sm:py-24">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          {/* Left Column: Gallery & Description */}
+          <div className="lg:col-span-8 space-y-16">
+            
+            {/* Gallery */}
             {allImages.length > 0 && (
-              <div className="mb-12">
-                <h2 className="text-[11px] font-bold tracking-[0.3em] uppercase text-black/30 mb-4">รูปภาพผลงาน ({allImages.length} รูป)</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {allImages.map((img, i) => (
-                    <div
-                      key={i}
-                      className="relative group cursor-pointer rounded-lg overflow-hidden border border-black/[0.06] hover:border-black/20 hover:shadow-lg transition-all"
-                      onClick={() => openLightbox(i)}
-                    >
-                      <img src={img.url} alt={img.caption || `ภาพที่ ${i + 1}`} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                        <span className="text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm">
-                          คลิกดูรูปใหญ่
-                        </span>
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 fill-mode-both">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-8 h-[1px] bg-blue-600 rounded-full" />
+                  <h2 className="text-[13px] font-bold tracking-[0.2em] uppercase text-slate-800">แกลเลอรีภาพผลงาน</h2>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-6 sm:gap-8">
+                  {allImages.map((img, i) => {
+                    const isSquare = img.width && img.height && img.width === img.height;
+                    
+                    return (
+                      <div
+                        key={i}
+                        className={`relative group cursor-pointer overflow-hidden rounded-3xl bg-slate-100 shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 border border-slate-200 ${isSquare ? 'col-span-1 aspect-square' : 'col-span-2'}`}
+                        onClick={() => openLightbox(i)}
+                      >
+                        <img src={img.url} alt={img.caption || `ภาพที่ ${i + 1}`} className="w-full h-full object-cover transform-gpu max-h-[85vh] group-hover:scale-[1.03] transition-transform duration-700 ease-in-out" />
+                        
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+                        
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-500 transform group-hover:-translate-y-2">
+                           <span className="bg-white/20 backdrop-blur-md text-white font-bold text-xs px-4 py-2 rounded-full border border-white/30 shadow-lg">
+                             ขยายภาพ
+                           </span>
+                        </div>
+
+                        {img.caption && (
+                          <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                            <span className="inline-block text-[11px] sm:text-[13px] font-semibold bg-white/20 backdrop-blur-xl text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-lg sm:rounded-xl border border-white/30 shadow-xl shadow-black/30 line-clamp-2">
+                              {img.caption}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      {/* Size badge */}
-                      {img.width && img.height && (
-                        <span className="absolute bottom-2 right-2 text-[9px] bg-black/50 text-white px-2 py-0.5 rounded-full backdrop-blur-sm font-mono">
-                          {img.width}×{img.height}
-                        </span>
-                      )}
-                      {img.caption && (
-                        <span className="absolute bottom-2 left-2 text-[10px] bg-black/50 text-white px-2 py-0.5 rounded-full backdrop-blur-sm">
-                          {img.caption}
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Description */}
+            {/* Description Prose */}
             {post.description && (
-              <div>
-                <h2 className="text-[11px] font-bold tracking-[0.3em] uppercase text-black/30 mb-4">รายละเอียด</h2>
-                <div className="prose prose-base max-w-none prose-p:text-black/55 prose-p:font-light prose-p:leading-relaxed prose-headings:font-bold prose-headings:text-black"
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300 fill-mode-both">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-8 h-[1px] bg-blue-600 rounded-full" />
+                  <h2 className="text-[13px] font-bold tracking-[0.2em] uppercase text-slate-800">รายละเอียดงาน</h2>
+                </div>
+                <div className="prose prose-lg max-w-none prose-p:text-slate-600 prose-p:font-light prose-p:leading-[1.8] prose-headings:font-bold prose-headings:text-slate-900 prose-headings:tracking-tight prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-img:rounded-2xl prose-img:shadow-lg"
                   dangerouslySetInnerHTML={{
                     __html: post.description
                       .split('\n')
@@ -228,77 +242,148 @@ export default function PortfolioDetailPage() {
                 />
               </div>
             )}
-          </div>
-
-          {/* Right: Specs Sidebar */}
-          <div className="space-y-6">
-            {specItems.length > 0 && (
-              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                <h3 className="text-[11px] font-bold tracking-[0.3em] uppercase text-black/30 mb-5">ข้อมูลโครงการ</h3>
-                <div className="space-y-4">
-                  {specItems.map((spec, i) => (
-                    <div key={i} className="border-b border-slate-200 pb-3 last:border-0 last:pb-0">
-                      <p className="text-[10px] text-black/30 font-medium uppercase tracking-wide mb-1">{spec.label}</p>
-                      <p className="text-sm text-black/80 font-semibold">{spec.value}</p>
-                    </div>
-                  ))}
-                </div>
+            
+            {/* Tags line */}
+            {post.tags?.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-8 border-t border-slate-200">
+                {post.tags.map((tag: string) => (
+                  <span key={tag} className="text-[12px] text-slate-500 bg-white border border-slate-200 shadow-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:border-slate-300 hover:bg-slate-50 transition-colors">
+                    <Tag weight="bold" className="text-blue-500" /> {tag}
+                  </span>
+                ))}
               </div>
             )}
+          </div>
 
-            {/* CTA */}
-            <div className="bg-blue-600 rounded-2xl p-6 text-white text-center">
-              <p className="text-lg font-bold mb-2">สนใจติดฟิล์มแบบนี้?</p>
-              <p className="text-white/60 text-sm font-light mb-4">ปรึกษาฟรี ประเมินราคาให้เลย</p>
-              <Link href="/#contact" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-50 transition-all">
-                ติดต่อเราเลย <ArrowR weight="bold" />
-              </Link>
+          {/* Right Column: Sticky Sidebar */}
+          <div className="lg:col-span-4 relative">
+            <div className="sticky top-32 space-y-6">
+              
+              {/* Specs Card */}
+              {specItems.length > 0 && (
+                <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group animate-in fade-in slide-in-from-right-8 duration-1000 delay-500 fill-mode-both">
+                  {/* Decorative blur inside card */}
+                  <div className="absolute -top-12 -right-12 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-colors duration-500" />
+                  
+                  <h3 className="text-[12px] font-black tracking-[0.2em] uppercase text-slate-400 mb-6 flex items-center gap-2">
+                    <Ruler weight="bold" className="text-lg" /> ข้อมูลโครงการ
+                  </h3>
+                  
+                  <div className="space-y-5 relative z-10">
+                    {specItems.map((spec, i) => (
+                      <div key={i} className="flex justify-between items-end border-b border-slate-100 pb-3 group/item">
+                        <span className="text-[13px] text-slate-400 font-medium">{spec.label}</span>
+                        <span className="text-[15px] font-bold text-slate-800 text-right max-w-[60%] group-hover/item:text-blue-600 transition-colors">{spec.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Film Specs Card */}
+              {parsedSpecs.length > 0 && (
+                <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 shadow-2xl relative overflow-hidden text-white animate-in fade-in slide-in-from-right-8 duration-1000 delay-600 fill-mode-both border border-slate-700">
+                  <div className="absolute -top-20 -right-20 w-48 h-48 bg-blue-500/20 blur-3xl rounded-full mix-blend-screen" />
+                  <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-500/20 blur-2xl rounded-full mix-blend-screen" />
+                  
+                  <h3 className="text-[12px] font-black tracking-[0.2em] uppercase text-white/50 mb-5 flex items-center gap-2 relative z-10">
+                    <Sparkle weight="fill" className="text-blue-400 text-lg" /> สเปกฟิล์ม
+                  </h3>
+                  
+                  <div className="grid grid-cols-2 gap-3 relative z-10">
+                    {parsedSpecs.map((spec: string, i: number) => {
+                      let label = spec;
+                      let val = "";
+                      const numIndex = spec.search(/\d/);
+                      if (numIndex > 0) {
+                         label = spec.substring(0, numIndex).trim();
+                         val = spec.substring(numIndex).trim();
+                      }
+                      
+                      return (
+                        <div key={i} className="bg-white/5 hover:bg-white/10 transition-colors rounded-2xl p-4 border border-white/10 flex flex-col justify-center items-center text-center group/spec shadow-inner">
+                          <span className="text-[10px] text-white/40 uppercase tracking-[0.1em] font-bold mb-1">{label}</span>
+                          <span className="text-xl font-black tracking-tight text-white group-hover/spec:text-blue-300 transition-colors">{val || label}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Call to Action Card */}
+              <div className="rounded-3xl p-8 relative overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-800 text-white shadow-xl shadow-blue-900/20 animate-in fade-in slide-in-from-right-8 duration-1000 delay-700 fill-mode-both group">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-700" />
+                
+                <h4 className="text-2xl font-black mb-3 relative z-10 drop-shadow-md">ต้องการฟิล์มสเปกนี้?</h4>
+                <p className="text-blue-100 text-sm font-light mb-8 relative z-10 leading-relaxed text-balance">
+                  เราประเมินราคาและให้คำปรึกษาฟรี ทั่วกรุงเทพฯ และปริมณฑล
+                </p>
+                
+                <Link href="/#contact" className="relative z-10 w-full flex items-center justify-center gap-2 bg-white text-blue-600 font-bold py-4 px-6 rounded-xl hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                  รับคำปรึกษาฟรี <ArrowR weight="bold" />
+                </Link>
+              </div>
+
             </div>
           </div>
         </div>
       </div>
 
-      {/* Footer CTA */}
-      <section className="bg-[#f7f8fa] border-t border-black/5 py-16 px-6 sm:px-10">
-        <div className="max-w-[900px] mx-auto text-center">
-          <p className="text-[11px] font-bold tracking-[0.4em] uppercase text-black/30 mb-3">ดูผลงานเพิ่มเติม</p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-black mb-4">ผลงานอื่นๆ ของเรา</h2>
-          <Link href="/portfolio" className="inline-flex items-center gap-2 px-8 py-3.5 text-[12px] font-bold tracking-[0.2em] uppercase bg-black text-white hover:bg-black/80 hover:scale-105 transition-all rounded-xl">
-            ดูผลงานทั้งหมด <ArrowR weight="bold" />
+      {/* Footer Section - Recommended Projects */}
+      <section className="bg-white border-t border-slate-100 py-24 px-6 sm:px-10">
+        <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="w-8 h-[1px] bg-slate-300 rounded-full" />
+              <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-slate-400">Our Portfolio</p>
+            </div>
+            <h2 className="text-3xl font-black tracking-tight text-slate-800">ผลงานติดตั้งอื่นๆ</h2>
+          </div>
+          
+          <Link href="/portfolio" className="group inline-flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-2xl hover:bg-blue-600 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-blue-500/30">
+            <span className="text-[13px] font-bold tracking-[0.1em] uppercase">ดูผลงานทั้งหมด</span>
+            <ArrowR weight="bold" className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
       </section>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Modal (Glassmorphism) */}
       {lightboxOpen && allImages.length > 0 && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center" onClick={closeLightbox}>
-          <button onClick={closeLightbox} className="absolute top-6 right-6 text-white/60 hover:text-white transition-colors z-50">
-            <X weight="bold" className="text-3xl" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl animate-in fade-in duration-300" onClick={closeLightbox}>
+          <button onClick={closeLightbox} className="absolute top-6 right-6 w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all z-50 backdrop-blur-md border border-white/10">
+            <X weight="bold" className="text-xl" />
           </button>
 
           {allImages.length > 1 && (
             <>
               <button onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors z-50 p-2">
-                <CaretLeft weight="bold" className="text-4xl" />
+                className="absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center bg-white/5 hover:bg-white/20 text-white rounded-full transition-all z-50 backdrop-blur-md border border-white/5 hover:scale-110">
+                <CaretLeft weight="bold" className="text-2xl" />
               </button>
               <button onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors z-50 p-2">
-                <CaretRight weight="bold" className="text-4xl" />
+                className="absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center bg-white/5 hover:bg-white/20 text-white rounded-full transition-all z-50 backdrop-blur-md border border-white/5 hover:scale-110">
+                <CaretRight weight="bold" className="text-2xl" />
               </button>
             </>
           )}
 
-          <div className="max-w-[90vw] max-h-[85vh] relative" onClick={e => e.stopPropagation()}>
-            <img
-              src={allImages[lightboxIndex].url}
-              alt={allImages[lightboxIndex].caption || ''}
-              className="max-w-full max-h-[85vh] object-contain rounded-lg"
-            />
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/60 px-4 py-2 rounded-full backdrop-blur-sm">
-              <span className="text-white/60 text-sm">{lightboxIndex + 1} / {allImages.length}</span>
+          <div className="max-w-[95vw] sm:max-w-[85vw] max-h-[85vh] relative flex flex-col items-center animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
+            <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+               <img
+                 src={allImages[lightboxIndex].url}
+                 alt={allImages[lightboxIndex].caption || ''}
+                 className="max-w-full max-h-[80vh] object-contain"
+               />
+            </div>
+            
+            <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-white/10 px-6 py-3 rounded-full backdrop-blur-md border border-white/10 shadow-xl whitespace-nowrap">
+              <span className="text-white font-bold text-sm bg-white/20 px-3 py-1 rounded-lg">{lightboxIndex + 1} / {allImages.length}</span>
+              {allImages[lightboxIndex].caption && (
+                 <span className="text-white/90 text-sm font-medium pr-2 max-w-[200px] sm:max-w-[400px] truncate">{allImages[lightboxIndex].caption}</span>
+              )}
               {allImages[lightboxIndex].width && allImages[lightboxIndex].height && (
-                <span className="text-white/40 text-xs font-mono">
+                <span className="text-white/40 text-xs font-mono hidden sm:inline-block">
                   {allImages[lightboxIndex].width}×{allImages[lightboxIndex].height}
                 </span>
               )}

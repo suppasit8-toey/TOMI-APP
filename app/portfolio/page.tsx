@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { supabase } from '@/lib/supabase';
-import { ArrowRight, MapPin, Buildings, ImageSquare } from '@phosphor-icons/react/dist/ssr';
+import { MapPin } from '@phosphor-icons/react/dist/ssr';
+import PortfolioClient from './PortfolioClient';
 
 export const revalidate = 60;
 
@@ -28,7 +29,7 @@ export default async function PortfolioPage() {
     if (data) posts = data;
   } catch {}
 
-  // Unique locations for filter display
+  // Unique locations for display in header
   const locations = Array.from(new Set(posts.map(p => p.location_area).filter(Boolean)));
 
   return (
@@ -84,76 +85,8 @@ export default async function PortfolioPage() {
         </div>
       </header>
 
-      <main className="max-w-[1200px] mx-auto px-6 sm:px-10 py-16">
-        {posts.length === 0 ? (
-          <div className="text-center py-32">
-            <Buildings className="text-6xl text-black/10 mx-auto mb-4" weight="thin" />
-            <p className="text-black/30 font-light">ยังไม่มีผลงานที่เผยแพร่</p>
-            <p className="text-black/20 text-sm mt-2">กลับมาใหม่เร็วๆ นี้</p>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post) => (
-              <article key={post.id}>
-                <Link href={`/portfolio/${post.slug}`} className="group block border border-black/[0.07] hover:border-black/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 rounded-xl overflow-hidden">
-                  {/* Cover Image */}
-                  <div className="aspect-[16/10] w-full bg-black/5 overflow-hidden relative">
-                    {post.cover_image_url ? (
-                      <img src={post.cover_image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                        <ImageSquare className="text-5xl text-slate-300" weight="thin" />
-                      </div>
-                    )}
-                    {/* Film Type Badge */}
-                    {post.film_type && (
-                      <span className="absolute top-3 left-3 text-[10px] bg-black/60 text-white px-3 py-1 rounded-full font-bold backdrop-blur-sm">
-                        {post.film_type}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6">
-                    {/* Location */}
-                    {(post.location_name || post.location_area) && (
-                      <div className="flex items-center gap-1.5 mb-3">
-                        <MapPin weight="fill" className="text-xs text-blue-500 shrink-0" />
-                        <span className="text-[11px] text-black/40 font-medium truncate">
-                          {[post.location_name, post.location_area].filter(Boolean).join(', ')}
-                        </span>
-                      </div>
-                    )}
-
-                    <h2 className="font-bold text-black text-base leading-snug group-hover:text-black/70 transition-colors mb-2 line-clamp-2">
-                      {post.title}
-                    </h2>
-
-                    {/* Film Info */}
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {post.film_brand && (
-                        <span className="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-semibold">
-                          {post.film_brand} {post.film_model}
-                        </span>
-                      )}
-                      {post.glass_area_sqm > 0 && (
-                        <span className="text-[10px] text-black/30 bg-black/[0.04] px-2 py-0.5 rounded font-medium">
-                          {post.glass_area_sqm} ตร.ม.
-                        </span>
-                      )}
-                    </div>
-
-                    {/* View More */}
-                    <div className="mt-4 pt-4 border-t border-black/5 flex items-center gap-1 text-[11px] font-bold tracking-[0.1em] uppercase text-black/30 group-hover:text-blue-600 transition-colors">
-                      ดูผลงาน <ArrowRight weight="bold" className="group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-                </Link>
-              </article>
-            ))}
-          </div>
-        )}
-      </main>
+      {/* Client-side filter and grid */}
+      <PortfolioClient posts={posts} />
     </div>
   );
 }

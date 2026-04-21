@@ -99,7 +99,7 @@ export default async function LandingPage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                   </span>
-                  <p className="text-[10px] font-black tracking-[0.4em] uppercase text-white/70">ผู้เชี่ยวชาญด้านฟิล์มสถาปัตยกรรมระดับสากล</p>
+                  <p className="text-[10px] font-black tracking-wide uppercase text-white/70">ผู้เชี่ยวชาญด้านฟิล์มสถาปัตยกรรมระดับสากล</p>
                </div>
             </AnimatedSection>
             
@@ -116,10 +116,10 @@ export default async function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center gap-8 animate-fade-in-up animation-delay-400">
               <a href="#contact" className="group relative h-20 w-full sm:w-auto px-16 bg-blue-600 overflow-hidden rounded-full flex items-center justify-center transition-all duration-700 hover:scale-105 active:scale-95 shadow-2xl shadow-blue-600/30">
                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-                 <span className="relative text-[13px] font-black tracking-[0.3em] uppercase">ปรึกษาเบื้องต้น</span>
+                 <span className="relative text-[13px] font-black tracking-wide uppercase">ปรึกษาเบื้องต้น</span>
                  <ArrowRight weight="bold" className="relative ml-4 group-hover:translate-x-2 transition-transform" />
               </a>
-              <a href="/catalog" className="text-[12px] font-black tracking-[0.3em] uppercase text-white/40 hover:text-white transition-all underline underline-offset-[12px] decoration-white/10 hover:decoration-white">
+              <a href="/catalog" className="text-[12px] font-black tracking-wide uppercase text-white/40 hover:text-white transition-all underline underline-offset-[12px] decoration-white/10 hover:decoration-white">
                 เลือกชมแคตตาล็อกสินค้า
               </a>
             </div>
@@ -141,7 +141,7 @@ export default async function LandingPage() {
         {/* Scroll Indicator */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 opacity-30">
            <div className="w-[1px] h-20 bg-gradient-to-b from-white to-transparent" />
-           <p className="text-[9px] font-black tracking-[0.5em] uppercase vertical-rl">เลื่อนลง</p>
+           <p className="text-[9px] font-black tracking-wide uppercase vertical-rl">เลื่อนลง</p>
         </div>
       </section>
 
@@ -159,7 +159,7 @@ export default async function LandingPage() {
                            <House weight="fill" className="text-4xl text-blue-500" />
                         </div>
                         <div>
-                           <span className="text-[11px] font-black tracking-[0.5em] uppercase text-blue-500 mb-6 block">01 / ที่พักอาศัย</span>
+                           <span className="text-[11px] font-black tracking-wide uppercase text-blue-500 mb-6 block">01 / ที่พักอาศัย</span>
                            <h3 className="text-[48px] font-black leading-none uppercase mb-8">{content.service1_title}</h3>
                            <p className="text-slate-400 text-lg leading-relaxed max-w-md font-light">{content.service1_desc}</p>
                         </div>
@@ -180,7 +180,7 @@ export default async function LandingPage() {
                            <ArrowUpRight weight="bold" className="text-white text-3xl opacity-20 group-hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="relative z-10">
-                           <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-400 mb-4 block">02 / ธุรกิจและองค์กร</span>
+                           <span className="text-[10px] font-black tracking-wide uppercase text-blue-400 mb-4 block">02 / ธุรกิจและองค์กร</span>
                            <h3 className="text-3xl font-black text-white uppercase mb-4">{content.service2_title}</h3>
                            <p className="text-slate-400 text-sm font-light leading-relaxed">{content.service2_desc}</p>
                         </div>
@@ -195,7 +195,7 @@ export default async function LandingPage() {
                               <Car weight="fill" className="text-3xl text-white" />
                            </div>
                            <div>
-                              <span className="text-[10px] font-black tracking-[0.4em] uppercase text-blue-500 mb-4 block">03 / ยานยนต์</span>
+                              <span className="text-[10px] font-black tracking-wide uppercase text-blue-500 mb-4 block">03 / ยานยนต์</span>
                               <h3 className="text-3xl font-black text-white uppercase mb-4">{content.service3_title}</h3>
                               <p className="text-slate-500 text-sm font-light leading-relaxed">{content.service3_desc}</p>
                            </div>
@@ -212,7 +212,7 @@ export default async function LandingPage() {
          <div className="container mx-auto px-6 lg:px-20">
             <div className="flex flex-col lg:flex-row gap-20 items-center mb-32">
                <div className="lg:w-1/2">
-                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">ประสิทธิภาพของฟิล์ม</p>
+                  <p className="text-blue-600 text-[11px] font-black tracking-wide uppercase mb-8">ประสิทธิภาพของฟิล์ม</p>
                   <h2 className="text-[56px] lg:text-[80px] font-black leading-[0.9] uppercase tracking-tighter mb-12">
                     ทัศนวิสัย<br /><span className="text-slate-300">คมชัด.</span><br />การปกป้องสูงสุด.
                   </h2>
@@ -225,7 +225,7 @@ export default async function LandingPage() {
                      ].map((item, i) => (
                         <div key={i}>
                            <p className={`text-4xl font-black mb-1 ${item.color}`}>{item.val}</p>
-                           <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">{item.label}</p>
+                           <p className="text-[10px] font-black tracking-wide uppercase text-slate-400">{item.label}</p>
                         </div>
                      ))}
                   </div>
@@ -250,8 +250,8 @@ export default async function LandingPage() {
                              </div>
                              
                              <div className="relative z-10">
-                                <h4 className="text-[13px] font-black tracking-[0.2em] uppercase text-slate-900 group-hover:text-white transition-colors mb-2">{feat.text}</h4>
-                                <p className="text-[10px] font-medium text-slate-400 group-hover:text-white/60 transition-colors uppercase tracking-widest">{feat.desc}</p>
+                                <h4 className="text-[13px] font-black tracking-wide uppercase text-slate-900 group-hover:text-white transition-colors mb-2">{feat.text}</h4>
+                                <p className="text-[10px] font-medium text-slate-400 group-hover:text-white/60 transition-colors uppercase tracking-wide">{feat.desc}</p>
                              </div>
                              
                              {/* Decorative Corner Icon */}
@@ -271,7 +271,7 @@ export default async function LandingPage() {
       <section id="process" className="py-40 bg-slate-950 relative overflow-hidden">
          <div className="container mx-auto px-6 lg:px-20 relative z-10">
             <div className="text-center mb-20 lg:mb-32">
-               <p className="text-blue-500 text-[11px] font-black tracking-[0.5em] uppercase mb-8">มาตรฐานการทำงานสากล</p>
+               <p className="text-blue-500 text-[11px] font-black tracking-wide uppercase mb-8">มาตรฐานการทำงานสากล</p>
                <h2 className="text-[56px] lg:text-[80px] font-black leading-[0.9] uppercase tracking-tighter text-white">
                  เส้นทางสู่<br /><span className="text-white/20">ความสมบูรณ์แบบ.</span>
                </h2>
@@ -317,7 +317,7 @@ export default async function LandingPage() {
          <div className="container mx-auto px-6 max-w-4xl">
             <div className="text-center mb-24">
                <h2 className="text-5xl font-black lowercase italic tracking-tight mb-4">ข้อมูลเจาะลึก.</h2>
-               <p className="text-slate-500 font-light tracking-widest uppercase text-[10px]">ทุกสิ่งที่คุณควรทราบเกี่ยวกับบริการของเรา</p>
+               <p className="text-slate-500 font-light tracking-wide uppercase text-[10px]">ทุกสิ่งที่คุณควรทราบเกี่ยวกับบริการของเรา</p>
             </div>
             
             <div className="space-y-4">
@@ -351,12 +351,12 @@ export default async function LandingPage() {
                   {/* Floating Certificate Card */}
                   <div className="absolute -bottom-10 -right-10 bg-blue-600 p-8 rounded-[40px] text-white shadow-2xl max-w-xs animate-float">
                      <Medal weight="duotone" className="text-4xl mb-4" />
-                     <p className="text-sm font-black tracking-widest uppercase mb-2">การรับรองความเป็นเลิศ</p>
+                     <p className="text-sm font-black tracking-wide uppercase mb-2">การรับรองความเป็นเลิศ</p>
                      <p className="text-xs text-white/60 leading-relaxed font-light">เราคัดสรรฟิล์มเกรดพรีเมียมพร้อมการรับรองมาตรฐานสากล เพื่อความมั่นใจในทุกการติดตั้ง</p>
                   </div>
                </div>
                <div className="lg:w-1/2">
-                  <p className="text-blue-600 text-[11px] font-black tracking-[0.5em] uppercase mb-8">ประวัติและความน่าเชื่อถือ</p>
+                  <p className="text-blue-600 text-[11px] font-black tracking-wide uppercase mb-8">ประวัติและความน่าเชื่อถือ</p>
                   <h2 className="text-[56px] lg:text-[72px] font-black leading-[0.95] tracking-tighter uppercase mb-12">
                     ตำนานแห่ง<br /><span className="text-slate-300">ความแม่นยำ.</span>
                   </h2>
@@ -376,7 +376,7 @@ export default async function LandingPage() {
                            </div>
                         ))}
                      </div>
-                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-wide">
                        ได้รับความไว้วางใจจาก <span className="text-slate-900">500+ โครงการหรู</span> ทั่วกรุงเทพฯ
                      </p>
                   </div>
@@ -399,14 +399,14 @@ export default async function LandingPage() {
                <div className="flex flex-col gap-6">
                   <a href={`tel:${content.contact_phone}`} className="h-24 bg-white text-slate-950 rounded-[32px] flex items-center justify-between px-10 group hover:bg-slate-100 transition-all">
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ติดต่อผู้เชี่ยวชาญ</span>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide mb-1">ติดต่อผู้เชี่ยวชาญ</span>
                         <span className="text-2xl font-black">{content.contact_phone}</span>
                      </div>
                      <Phone weight="fill" className="text-3xl text-blue-600 group-hover:rotate-12 transition-transform" />
                   </a>
                   <a href={`https://line.me/R/ti/p/${content.contact_line_id}`} className="h-24 bg-slate-900 border border-white/10 text-white rounded-[32px] flex items-center justify-between px-10 group hover:bg-slate-800 transition-all">
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">บัญชี Line ทางการ</span>
+                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-wide mb-1">บัญชี Line ทางการ</span>
                         <span className="text-2xl font-black">{content.contact_line_id}</span>
                      </div>
                      <ChatCircleDots weight="fill" className="text-3xl text-[#00B900]" />
@@ -456,16 +456,16 @@ export default async function LandingPage() {
                </div>
                <div className="grid grid-cols-2 sm:grid-cols-3 gap-16">
                   <div>
-                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-8">เมนู</h4>
-                     <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase tracking-widest">
+                     <h4 className="text-[10px] font-black text-white uppercase tracking-wide mb-8">เมนู</h4>
+                     <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase tracking-wide">
                         <li><a href="#services" className="hover:text-blue-500 transition-colors">ผลงานติดตั้ง</a></li>
                         <li><a href="#film-types" className="hover:text-blue-500 transition-colors">แคตตาล็อก</a></li>
                         <li><a href="/blog" className="hover:text-blue-500 transition-colors">บทความ</a></li>
                      </ul>
                   </div>
                   <div>
-                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-8">ติดตามเรา</h4>
-                     <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase tracking-widest">
+                     <h4 className="text-[10px] font-black text-white uppercase tracking-wide mb-8">ติดตามเรา</h4>
+                     <ul className="space-y-4 text-xs font-bold text-slate-600 uppercase tracking-wide">
                         <li><a href="#" className="hover:text-blue-500 transition-colors">IG</a></li>
                         <li><a href="#" className="hover:text-blue-500 transition-colors">FB</a></li>
                         <li><a href="#" className="hover:text-blue-500 transition-colors">LI</a></li>

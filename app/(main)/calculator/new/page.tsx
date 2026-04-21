@@ -99,7 +99,7 @@ export default function CalculatorNewPage() {
 
     const calculateCutting = () => {
         setSalesModalOpen(false);
-        let rawItems: any[] = []; let totalPanes = 0;
+        let rawItems: any[] = []; let totalPanes = 0; let rawItemIdx = 0;
         locations.forEach(loc => {
             const locName = loc.name || 'ไม่ระบุ';
             loc.items.forEach((item: any) => {
@@ -107,7 +107,7 @@ export default function CalculatorNewPage() {
                 let w = unit === 'cm' ? inputW / 2.54 : inputW; let h = unit === 'cm' ? inputH / 2.54 : inputH;
                 if (w > 0 && h > 0) {
                     let fullName = `${locName}: ${name}`;
-                    for(let i=0; i<qty; i++) { rawItems.push({ name: qty > 1 ? `${fullName} (#${i+1})` : fullName, w, h, inputW, inputH, id: i + '_' + Date.now() }); }
+                    for(let i=0; i<qty; i++) { rawItems.push({ name: qty > 1 ? `${fullName} (#${i+1})` : fullName, w, h, inputW, inputH, id: `raw_${rawItemIdx++}_${Date.now()}` }); }
                     totalPanes += qty;
                 }
             });
@@ -412,7 +412,7 @@ export default function CalculatorNewPage() {
                                                         {shelf.columns.map((col: any, cIdx: number) => { let pct = (col.w / rollWidth) * 100; return (<div key={cIdx} className="h-full flex flex-col border-r-2 border-white" style={{width: `${pct}%`}}>{col.items.map((it:any, iIdx:number) => (<div key={iIdx} className="w-full bg-[#17a2b8] text-white flex items-center justify-center font-black text-[10px] sm:text-xs overflow-hidden border-b border-white/50" style={{height: `${(it.finalH / shelf.height)*100}%`}}>{it.finalW.toFixed(1)}x{it.finalH.toFixed(1)}</div>))}{col.remainH > 0 && <div className="w-full bg-[#6c757d] text-white flex items-center justify-center font-bold text-[9px]" style={{height: `${(col.remainH / shelf.height)*100}%`}}>เศษ</div>}</div>); })}
                                                         {wasteW > 0 && (wasteW >= WASTE_STOCK_LIMIT ? <div className="bg-[#ffc107] text-black font-black flex items-center justify-center text-xs" style={{width: `${(wasteW/rollWidth)*100}%`}}>STOCK {wasteW}&quot;</div> : <div className="bg-[#5c636a] text-white font-bold flex items-center justify-center text-[10px]" style={{width: `${(wasteW/rollWidth)*100}%`}}>เศษ {wasteW}&quot;</div>)}
                                                     </div>
-                                                    <table className="w-full text-left border-collapse border border-slate-300 text-[13px]"><thead><tr className="bg-slate-50 border-b border-slate-300 text-slate-700 font-bold"><th className="p-2 border-r border-slate-300">รายการในชุดนี้</th><th className="p-2 text-center w-28">มิติ (กxย)</th></tr></thead><tbody>{shelf.columns.map((col:any) => col.items.map((it:any, iIdx:number) => (<tr key={it.id + '_' + iIdx} className="border-b border-slate-200"><td className="p-2 border-r border-slate-300 font-medium">{it.name}</td><td className="p-2 text-center font-black text-black">{it.finalW.toFixed(1)} x {it.finalH.toFixed(1)}</td></tr>)))}{wasteW >= WASTE_STOCK_LIMIT && (<tr className="bg-amber-50 border-b border-amber-200"><td className="p-2 border-r border-amber-200 font-bold text-amber-800 flex items-center gap-1">♻️ เศษสต็อกเก็บไว้ใช้งาน</td><td className="p-2 text-center font-black text-amber-900">{wasteW.toFixed(1)} x {pullLength}</td></tr>)}</tbody></table>
+                                                    <table className="w-full text-left border-collapse border border-slate-300 text-[13px]"><thead><tr className="bg-slate-50 border-b border-slate-300 text-slate-700 font-bold"><th className="p-2 border-r border-slate-300">รายการในชุดนี้</th><th className="p-2 text-center w-28">มิติ (กxย)</th></tr></thead><tbody>{shelf.columns.map((col:any, cIdx:number) => col.items.map((it:any, iIdx:number) => (<tr key={`col_${cIdx}_item_${iIdx}_${it.id}`} className="border-b border-slate-200"><td className="p-2 border-r border-slate-300 font-medium">{it.name}</td><td className="p-2 text-center font-black text-black">{it.finalW.toFixed(1)} x {it.finalH.toFixed(1)}</td></tr>)))}{wasteW >= WASTE_STOCK_LIMIT && (<tr key="waste" className="bg-amber-50 border-b border-amber-200"><td className="p-2 border-r border-amber-200 font-bold text-amber-800 flex items-center gap-1">♻️ เศษสต็อกเก็บไว้ใช้งาน</td><td className="p-2 text-center font-black text-amber-900">{wasteW.toFixed(1)} x {pullLength}</td></tr>)}</tbody></table>
                                                 </div>
                                             </div>
                                         );
