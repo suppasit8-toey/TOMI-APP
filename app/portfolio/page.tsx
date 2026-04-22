@@ -40,7 +40,7 @@ export default async function PortfolioPage() {
         '@type': 'ItemList',
         name: 'ผลงานติดตั้งฟิล์ม TOMI FILM',
         description: 'รวมผลงานติดตั้งฟิล์มกรองแสง ฟิล์มกันความร้อน อาคาร คอนโด บ้าน สำนักงาน',
-        url: 'https://tomifilm.co.th/portfolio',
+        url: 'https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com/portfolio',
         numberOfItems: posts.length,
         itemListElement: posts.map((p, i) => ({
           '@type': 'ListItem',
@@ -48,7 +48,7 @@ export default async function PortfolioPage() {
           item: {
             '@type': 'Article',
             headline: p.title,
-            url: `https://tomifilm.co.th/portfolio/${p.slug}`,
+            url: `https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com/portfolio/${p.slug}`,
             image: p.cover_image_url || undefined,
             datePublished: p.created_at,
             author: { '@type': 'Organization', name: 'TOMI FILM' },

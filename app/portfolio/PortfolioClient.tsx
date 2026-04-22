@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, MapPin, Buildings, ImageSquare, Funnel } from '@phosphor-icons/react';
 
 interface PortfolioPost {
@@ -131,7 +132,7 @@ export default function PortfolioClient({ posts }: { posts: PortfolioPost[] }) {
                   {/* Cover Image */}
                   <div className="aspect-[16/10] w-full bg-black/5 overflow-hidden relative">
                     {post.cover_image_url ? (
-                      <img src={post.cover_image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                      <Image src={post.cover_image_url} alt={post.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
                         <ImageSquare className="text-5xl text-slate-300" weight="thin" />

@@ -70,8 +70,66 @@ export default async function CatalogSlugPage(props: CatalogPageProps) {
     .neq('slug', slug)
     .limit(5);
 
+  // Breadcrumb schema
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'หน้าแรก',
+        item: 'https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'แคตตาล็อก',
+        item: 'https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com/catalog'
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: item.title,
+        item: `https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com/catalog/${slug}`
+      }
+    ]
+  };
+
+  // Product schema
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: item.title,
+    image: item.image_url ? [item.image_url] : undefined,
+    description: item.short_description || item.title,
+    brand: {
+      '@type': 'Brand',
+      name: item.brand_label || 'TOMI FILM'
+    },
+    category: item.category_label || 'ฟิล์มสถาปัตยกรรม',
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'THB',
+      price: '0',
+      availability: 'https://schema.org/InStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'TOMI FILM'
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-blue-600 selection:text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       {/* Existing Navbar (Works best on light background when customized) */}
       <LandingNavbar />
 

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -121,13 +122,37 @@ export default function PortfolioDetailPage() {
           address: { '@type': 'PostalAddress', addressLocality: post.location_area },
         },
       })}} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'หน้าแรก',
+            item: 'https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com'
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'ผลงานติดตั้ง',
+            item: 'https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com/portfolio'
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: post.title,
+            item: `https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com/portfolio/${slug}`
+          }
+        ]
+      })}} />
 
       {/* Hero Section */}
       <div className="relative min-h-[65vh] flex items-end pb-16 sm:pb-24 pt-32 px-6 sm:px-10 overflow-hidden bg-[#0a0f18]">
         {/* Background Layers */}
         {post.cover_image_url && (
           <div className="absolute inset-0 z-0">
-            <img src={post.cover_image_url} alt={post.title} className="w-full h-full object-cover opacity-60" />
+            <Image src={post.cover_image_url} alt={post.title} fill priority sizes="100vw" className="object-cover opacity-60" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18] via-[#0a0f18]/80 to-[#0a0f18]/20" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f18]/90 via-transparent to-transparent" />
           </div>
@@ -194,7 +219,7 @@ export default function PortfolioDetailPage() {
                         className={`relative group cursor-pointer overflow-hidden rounded-3xl bg-slate-100 shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 border border-slate-200 ${isSquare ? 'col-span-1 aspect-square' : 'col-span-2'}`}
                         onClick={() => openLightbox(i)}
                       >
-                        <img src={img.url} alt={img.caption || `ภาพที่ ${i + 1}`} className="w-full h-full object-cover transform-gpu max-h-[85vh] group-hover:scale-[1.03] transition-transform duration-700 ease-in-out" />
+                        <Image src={img.url} alt={img.caption || `ภาพที่ ${i + 1}`} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transform-gpu max-h-[85vh] group-hover:scale-[1.03] transition-transform duration-700 ease-in-out" />
                         
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
                         

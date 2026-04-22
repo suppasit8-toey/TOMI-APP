@@ -72,9 +72,35 @@ export default async function BlogPostPage({ params }: Props) {
     keywords: post.tags?.join(', '),
   };
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'หน้าแรก',
+        item: 'https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'บทความ',
+        item: 'https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com/blog'
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: `https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com/blog/${slug}`
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-white font-sans">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       {/* Cover */}
       {post.cover_image_url && (

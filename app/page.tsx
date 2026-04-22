@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import {
   ArrowRight, ShieldCheck, Thermometer, FacebookLogo, Phone, ChatCircleDots,
@@ -70,15 +71,42 @@ export default async function LandingPage() {
     }
   } catch {}
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'TOMI FILM รับติดฟิล์มอาคาร',
+    image: content.hero_image_url,
+    '@id': 'https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com',
+    url: 'https://www.xn--42cf2bdb5dorp5fubrbrf74a0b.com',
+    telephone: content.contact_phone,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Tomifilm',
+      addressLocality: 'Bangkok',
+      addressCountry: 'TH'
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 13.85440899490734,
+      longitude: 100.80680307620034
+    },
+    priceRange: '฿฿',
+    description: content.hero_subtitle
+  };
+
   return (
     <div className="min-h-screen font-sans bg-slate-950 text-white selection:bg-blue-600 selection:text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <LandingNavbar />
 
       {/* ═══ 1. ULTRA-PREMIUM HERO ═══ */}
       <section className="relative min-h-[100vh] flex items-center pt-24 overflow-hidden">
         {/* Cinematic Backdrop */}
         <div className="absolute inset-0 z-0">
-          <img src={content.hero_image_url || '/images/hero/banner.png'} alt="TOMI FILM – ฟิล์มกรองแสงอาคาร" className="w-full h-full object-cover opacity-40 scale-105" />
+          <Image src={content.hero_image_url || '/images/hero/banner.png'} alt="TOMI FILM – ฟิล์มกรองแสงอาคาร" fill priority className="object-cover opacity-40 scale-105" />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/40" />
         </div>
@@ -152,7 +180,7 @@ export default async function LandingPage() {
                {/* Large Featured Card */}
                <AnimatedSection animation="reveal-left" className="lg:col-span-7 h-full">
                   <div className="group h-full relative rounded-[48px] overflow-hidden bg-slate-900 border border-white/5">
-                     <img src={content.service1_image_url} alt="Residential" className="w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-[2s]" />
+                     <Image src={content.service1_image_url} alt="Residential" fill sizes="(max-width: 1024px) 100vw, 60vw" className="object-cover opacity-40 group-hover:scale-110 transition-transform duration-[2s]" />
                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
                      <div className="absolute inset-0 p-16 flex flex-col justify-between">
                         <div className="w-20 h-20 bg-white/10 backdrop-blur-2xl rounded-3xl flex items-center justify-center border border-white/10">
@@ -171,7 +199,7 @@ export default async function LandingPage() {
                <div className="lg:col-span-5 flex flex-col gap-8 h-full">
                   <AnimatedSection animation="reveal-right" className="flex-1">
                      <div className="group h-full relative rounded-[48px] overflow-hidden bg-slate-900 border border-white/5 p-12 flex flex-col justify-between">
-                        <img src={content.service2_image_url} alt="Corporate" className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-110 transition-transform duration-[2s]" />
+                        <Image src={content.service2_image_url} alt="Corporate" fill sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover opacity-20 group-hover:scale-110 transition-transform duration-[2s]" />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
                         <div className="relative z-10 flex justify-between items-start">
                            <div className="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/20">
@@ -189,7 +217,7 @@ export default async function LandingPage() {
                   
                   <AnimatedSection animation="reveal-right" className="flex-1">
                      <div className="group h-full relative rounded-[48px] overflow-hidden bg-slate-900 border border-white/5">
-                        <img src={content.service3_image_url} alt="Automotive" className="w-full h-full object-cover opacity-20 group-hover:scale-110 transition-transform duration-[2s]" />
+                        <Image src={content.service3_image_url} alt="Automotive" fill sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover opacity-20 group-hover:scale-110 transition-transform duration-[2s]" />
                         <div className="absolute inset-0 p-12 flex flex-col justify-between">
                            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-600/30">
                               <Car weight="fill" className="text-3xl text-white" />
@@ -298,7 +326,7 @@ export default async function LandingPage() {
                ].map((item, i) => (
                  <AnimatedSection key={i} animation="reveal" style={{ transitionDelay: `${i * 150}ms` }} className="h-full">
                     <div className="group relative h-full aspect-[3/4] rounded-[40px] overflow-hidden border border-white/5 bg-slate-900">
-                       <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-110 transition-transform duration-[1.5s]" />
+                       <Image src={item.img} alt={item.title} fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover opacity-30 group-hover:scale-110 transition-transform duration-[1.5s]" />
                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
                        <div className="absolute inset-0 p-10 flex flex-col justify-end">
                           <span className="text-4xl font-black text-blue-500 mb-4 block opacity-40 group-hover:opacity-100 transition-opacity italic">{item.step}</span>
@@ -346,7 +374,7 @@ export default async function LandingPage() {
             <div className="flex flex-col lg:flex-row items-center gap-20">
                <div className="lg:w-1/2 relative">
                   <div className="aspect-[4/5] relative rounded-[60px] overflow-hidden shadow-2xl">
-                     <img src={content.about_image_url} alt="About TOMI FILM" className="w-full h-full object-cover" />
+                     <Image src={content.about_image_url} alt="About TOMI FILM" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
                   </div>
                   {/* Floating Certificate Card */}
                   <div className="absolute -bottom-10 -right-10 bg-blue-600 p-8 rounded-[40px] text-white shadow-2xl max-w-xs animate-float">
@@ -371,8 +399,8 @@ export default async function LandingPage() {
                   <div className="pt-12 mt-12 border-t border-slate-100 flex items-center gap-8">
                      <div className="flex -space-x-4">
                         {[1,2,3,4].map(i => (
-                           <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden shadow-sm">
-                              <img src={`https://i.pravatar.cc/150?u=${i}`} alt="Client" />
+                           <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden shadow-sm relative">
+                              <Image src={`https://i.pravatar.cc/150?u=${i}`} alt="Client" fill sizes="48px" className="object-cover" />
                            </div>
                         ))}
                      </div>

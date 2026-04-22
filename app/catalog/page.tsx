@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import LandingNavbar from '@/components/LandingNavbar';
 import { CaretRight, House, Tag, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
@@ -53,11 +54,13 @@ export default async function CatalogMainPage() {
                   className="group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col"
                 >
                   <Link href={`/catalog/${item.slug}`} className="block relative aspect-[4/3] overflow-hidden bg-slate-100 shrink-0">
-                    <img 
+                    <Image 
                       src={item.image_url || 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=2070&auto=format&fit=crop'} 
                       alt={`ภาพประกอบ: ${item.title} - ${item.keywords || 'ติดตั้งฟิล์ม TOMI FILM'}`}
                       title={`${item.title} โดยทีมช่างผู้เชี่ยวชาญ TOMI FILM`}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s]"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-[2s]"
                     />
                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black text-slate-900 tracking-widest uppercase shadow-sm">
                       {item.category_label || 'SERVICE'}
